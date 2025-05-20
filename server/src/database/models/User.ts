@@ -1,13 +1,27 @@
-import { DataTypes } from "sequelize"
-import sequelize from ".."
+import { DataTypes, Model } from 'sequelize';
+import sequelize from '../config/database.ts';
 
-const User = sequelize.define(
-    'User', 
-    {
-        id: { type: DataTypes.INTEGER, primaryKey: true },
-        username: { type: DataTypes.STRING }
+class User extends Model {
+  public id!: number;
+  public name!: string;
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    { timestamps: false }
-)
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'users',
+  }
+);
 
-export default User
+export default User;
