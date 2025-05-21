@@ -1,17 +1,14 @@
-import express, { type Application } from 'express'
-import User from './database/models/User';
+import express, { type Application } from "express";
 
-const port = process.env.SERVER_PORT || 3300;
+const port = process.env.SERVER_API_PORT || 3000;
 const app: Application = express();
 
 app.use("/", async (_req, res) => {
-    const john = await User.create({ username: 'John Doe' });
-    console.log(john.toJSON());
-    res.json({ hello: "word!" });
+  res.json({ hello: "word!" });
 });
 
 app.use("/hello", (_req, res) => {
-    res.json({ foo: "bar" });
+  res.json({ foo: "bar" });
 });
 
 app.listen(port);
