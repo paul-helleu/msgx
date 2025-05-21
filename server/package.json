@@ -5,15 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite-node src/app.ts",
-    "api": "node src/server.ts",
+    "api": "node src/api/server.ts",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate": "npx sequelize-cli db:migrate"
   },
   "devDependencies": {
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.20",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
@@ -23,6 +25,7 @@
     "dotenv": "^16.5.0",
     "pg": "^8.16.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "6.6.3"
   }
 }

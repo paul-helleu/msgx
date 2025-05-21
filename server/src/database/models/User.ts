@@ -1,9 +1,15 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.ts';
+import sequelize from '../sequelize.ts';
 
 class User extends Model {
   public id!: number;
-  public name!: string;
+  public username!: string;
+  public password!: string;
+  static associate(models: any) {
+    this.hasMany(models.Conversation, { foreignKey: 'user_a'});
+    this.hasMany(models.Conversation, { foreignKey: 'user_b'});
+    this.hasOne(models.Message, { foreignKey: 'sender_id'});
+  }
 }
 
 User.init(
@@ -13,10 +19,14 @@ User.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    name: {
+    username: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   },
   {
     sequelize,
