@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "api": "vite-node src/app.ts",
+    "api": "vite-node src/api/server.ts",
     "socket": "vite-node src/socket.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "migrate": "npx sequelize-cli db:migrate"
+    "migrate": "npx sequelize-cli db:migrate",
+    "undo": "npx sequelize-cli db:migrate:undo"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

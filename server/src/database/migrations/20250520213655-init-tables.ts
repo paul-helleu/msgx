@@ -11,10 +11,21 @@ export default {
       username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique:true
       },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
 
@@ -43,6 +54,16 @@ export default {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
 
@@ -66,7 +87,7 @@ export default {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'conversations',
+          model: 'users',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -79,7 +100,22 @@ export default {
       content: {
         type: Sequelize.TEXT,
         allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },
+  async down(queryInterface: QueryInterface) {
+    await queryInterface.dropTable('messages');
+    await queryInterface.dropTable('conversations');
+    await queryInterface.dropTable('users');
+  }
 };
