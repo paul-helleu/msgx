@@ -8,8 +8,8 @@
     "socket": "vite-node src/socket.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "migrate": "npx sequelize-cli db:migrate",
-    "undo": "npx sequelize-cli db:migrate:undo"
+    "migrate": "sequelize-cli db:migrate",
+    "undo": "sequelize-cli db:migrate:undo"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
