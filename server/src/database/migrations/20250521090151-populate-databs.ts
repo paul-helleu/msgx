@@ -3,7 +3,7 @@ import { QueryInterface } from 'sequelize';
 export default {
   async up(queryInterface: QueryInterface): Promise<void> {
     await queryInterface.bulkInsert('users', [
-      {id:1, username: 'Alice', password: 'alice123' },
+      {id:1, username: 'Alice', password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe' }, // hasf of 1234
       {id:2, username: 'Bob', password: 'bob123' },
     ]);
 

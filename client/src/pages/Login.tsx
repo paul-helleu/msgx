@@ -1,6 +1,24 @@
 import './Login.css';
+import { useAuth } from '../components/AuthContext';
+import { useNavigate } from '@solidjs/router';
+import { createSignal } from 'solid-js';
 
 export default function Login() {
+  const { login } = useAuth();
+
+  const [username, setUsername] = createSignal('');
+  const [password, setPassword] = createSignal('');
+  const navigate = useNavigate();
+
+  async function handleLogin(e: Event) {
+    e.preventDefault();
+    try {
+      await login(username(), password());
+      navigate('/conversation');
+    } catch (err) {
+      console.log('Échec de la connexion', err);
+    }
+  }
   return (
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -11,20 +29,20 @@ export default function Login() {
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6">
+        <form class="space-y-6" onSubmit={handleLogin}>
           <div>
             <label
-              for="email"
+              for="username"
               class="block text-sm/6 font-medium text-gray-900"
             >
-              Adresse email
+              Nom d'utilisateur
             </label>
             <div class="mt-2">
               <input
-                type="email"
-                name="email"
-                id="email"
-                autocomplete="email"
+                type="text"
+                name="username"
+                id="username"
+                onInput={(e) => setUsername(e.currentTarget.value)}
                 required
                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               />
@@ -45,6 +63,7 @@ export default function Login() {
                 type="password"
                 name="password"
                 id="password"
+                onInput={(e) => setPassword(e.currentTarget.value)}
                 autocomplete="current-password"
                 required
                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
