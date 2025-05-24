@@ -2,11 +2,15 @@ import express from 'express';
 import dotenv from 'dotenv';
 import router from '../database/routes/index.ts';
 import sequelize from '../database/sequelize.ts';
+import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import User from '../database/models/User.ts';
 import { compareSync } from 'bcrypt-ts';
+import { isValidToken, type AuthenticatedRequest } from './auth.ts';
 
 dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'SECRET_KEY';
 
 const app = express();
 app.use(express.json());
@@ -27,9 +31,24 @@ app.post('/api/login', async (req, res) => {
     if (!isValid) {
       res.status(403).json({ message: 'Incorrect password' });
     }
+    const token = jwt.sign({ id: user.dataValues.id }, JWT_SECRET, { expiresIn: '3h' });
+    res.status(200).json({ message: 'Authentification Succedeed', token: token});
   }
-  res.status(200).json({ message: 'Authentification Succedeed' });
 })
+
+// Endpoint starting with /api/auth need "authorization: token" in req headers 
+app.get('/api/auth/user', isValidToken, async (req:AuthenticatedRequest, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findOne({ where: { id: userId } });
+    if(user){
+      const { id, username } = user.toJSON();
+      res.json({ id, username });    
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error });
+  }
+});
 
 // Sync Sequelize
 sequelize.sync().then(() => {

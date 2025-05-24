@@ -37,6 +37,7 @@ function Conversation() {
     <div>
       <div>
         <h1>Welcome to MSGx you have a new message</h1>
+        <h2>Token: {localStorage.getItem('token')}</h2>
       </div>
 
       <For each={store.messages}>
