@@ -1,13 +1,14 @@
 import './Login.css';
 import { useAuth } from '../components/AuthContext';
-import { useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
 
 export default function Login() {
   const { login } = useAuth();
 
   const [username, setUsername] = createSignal('');
   const [password, setPassword] = createSignal('');
+
   const navigate = useNavigate();
 
   async function handleLogin(e: Event) {
@@ -44,7 +45,7 @@ export default function Login() {
                 id="username"
                 onInput={(e) => setUsername(e.currentTarget.value)}
                 required
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               />
             </div>
           </div>
@@ -66,7 +67,7 @@ export default function Login() {
                 onInput={(e) => setPassword(e.currentTarget.value)}
                 autocomplete="current-password"
                 required
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               />
             </div>
           </div>
@@ -76,7 +77,7 @@ export default function Login() {
               type="submit"
               class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-              Sign in
+              Se Connecter
             </button>
           </div>
         </form>
@@ -84,7 +85,7 @@ export default function Login() {
         <p class="mt-10 text-center text-sm/6 text-gray-500">
           Pas encore connecté ?
           <a
-            href="#"
+            href="/register"
             class="font-semibold text-indigo-600 hover:text-indigo-500 pl-2"
           >
             Créer un compte ici

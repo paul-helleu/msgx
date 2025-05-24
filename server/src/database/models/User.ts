@@ -1,14 +1,18 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes } from 'sequelize';
 import sequelize from '../sequelize.ts';
 
-class User extends Model {
-  public id!: number;
-  public username!: string;
-  public password!: string;
+class User extends Model<
+  InferAttributes<User>,
+  InferCreationAttributes<User>
+> {
+  declare id: CreationOptional<number>;
+  declare username: string;
+  declare password: string;
+
   static associate(models: any) {
-    this.hasMany(models.Conversation, { foreignKey: 'user_a'});
-    this.hasMany(models.Conversation, { foreignKey: 'user_b'});
-    this.hasOne(models.Message, { foreignKey: 'sender_id'});
+    this.hasMany(models.Conversation, { foreignKey: 'user_a' });
+    this.hasMany(models.Conversation, { foreignKey: 'user_b' });
+    this.hasOne(models.Message, { foreignKey: 'sender_id' });
   }
 }
 
