@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../sequelize.ts';
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../sequelize.ts";
 
 class Message extends Model {
   public id!: number;
@@ -20,21 +20,21 @@ Message.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Conversation',
-        key: 'id',
+        model: "Conversation",
+        key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
-    sender_id:{
+    sender_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'User',
-        key: 'id',
+        model: "User",
+        key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     date: {
       type: DataTypes.DATE,
@@ -47,7 +47,7 @@ Message.init(
   },
   {
     sequelize,
-    tableName: 'messages',
+    tableName: "messages",
   }
 );
 

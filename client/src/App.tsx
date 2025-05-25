@@ -1,43 +1,32 @@
-import "./App.css";
-import { For } from "solid-js";
-import { io } from "socket.io-client";
-import { createStore } from "solid-js/store";
-
-interface Message {
-  sender: string;
-  receiver: string;
-  content: string;
-}
+import './App.css';
+import { createSignal, For } from 'solid-js';
+import { io } from 'socket.io-client';
+import { createStore } from 'solid-js/store';
+import type { Message } from './interfaces/Message';
 
 function App() {
-  const serverUri: string = "http://127.0.0.1:3300";
+  const serverUri = 'http://127.0.0.1:3300';
+  const username = 'Bob';
+  const destinataire = 'Alice';
+
   const socket = io(serverUri);
 
-  const username = "Bob"; // destinataire
-  const msgExample: Message = {
-    content: "Hello BOB",
-    receiver: "Bob",
-    sender: username,
-  };
-
-  const evIdentifier = `message/@${username.toLowerCase()}`;
   const [store, setStore] = createStore({
     messages: [] as Message[],
   });
+  const [messageContent, setMessageContent] = createSignal<string>('');
 
   const sendMsg = (msg: Message) => {
-    socket.emit(evIdentifier, msg);
+    socket.emit('message', msg);
   };
 
-  socket.on(evIdentifier, (msg) => {
-    setStore("messages", (messages) => [...messages, msg]);
+  socket.on(username, (msg) => {
+    setStore('messages', (messages) => [...messages, msg]);
   });
 
   return (
     <div>
-      <div>
-        <h1>Welcome to MSGx you have a new message</h1>
-      </div>
+      <h1>Welcome to MSGx</h1>
 
       <For each={store.messages}>
         {(item, index) => (
@@ -51,11 +40,19 @@ function App() {
       </For>
 
       <label>Entrer votre message</label>
-      <input type="text" name="message" />
+      <input
+        type="text"
+        name="message"
+        onInput={(e) => setMessageContent(e.target.value)}
+      />
       <button
         type="button"
         onclick={() => {
-          sendMsg(msgExample);
+          sendMsg({
+            content: messageContent(),
+            receiver: username,
+            sender: destinataire,
+          });
         }}
       >
         Envoyer
