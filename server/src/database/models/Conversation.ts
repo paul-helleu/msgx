@@ -3,9 +3,9 @@ import {
   Model,
   type CreationOptional,
   type InferAttributes,
-  type InferCreationAttributes
-} from 'sequelize';
-import sequelize from '../sequelize.ts';
+  type InferCreationAttributes,
+} from "sequelize";
+import sequelize from "../sequelize.ts";
 
 class Conversation extends Model<
   InferAttributes<Conversation>,
@@ -27,26 +27,26 @@ Conversation.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Users',
-        key: 'id',
+        model: "Users",
+        key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     user_b: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Users',
-        key: 'id',
+        model: "Users",
+        key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
   },
   {
     sequelize,
-    tableName: 'conversations',
+    tableName: "conversations",
   }
 );
 
