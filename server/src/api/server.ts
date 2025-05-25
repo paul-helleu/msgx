@@ -72,7 +72,9 @@ app.get('/api/auth/user', isValidToken, async (req:AuthenticatedRequest, res) =>
     res.status(500).json({ message: 'Server Error', error });
   }
 });
-
+app.get('/api/auth/valid_token', isValidToken, async (req:AuthenticatedRequest, res) => {
+  res.status(200).json({ message: 'Token Valid'});
+});
 // Sync Sequelize
 sequelize.sync().then(() => {
   console.log('Base de données synchronisée');
