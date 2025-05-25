@@ -3,9 +3,9 @@ import {
   Model,
   type CreationOptional,
   type InferAttributes,
-  type InferCreationAttributes
-} from 'sequelize';
-import sequelize from '../sequelize.ts';
+  type InferCreationAttributes,
+} from "sequelize";
+import sequelize from "../sequelize.ts";
 
 class Conversation extends Model<
   InferAttributes<Conversation>,

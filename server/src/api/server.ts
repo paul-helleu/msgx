@@ -83,9 +83,13 @@ app.get(
   }
 );
 
-app.get('/api/auth/valid_token', isValidToken, async (req:AuthenticatedRequest, res) => {
-  res.status(200).json({ message: 'Token Valid'});
-});
+app.get(
+  "/api/auth/valid_token",
+  isValidToken,
+  async (req: AuthenticatedRequest, res) => {
+    res.status(200).json({ message: "Token Valid" });
+  }
+);
 
 app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedRequest, res) => {
   try {
@@ -133,9 +137,7 @@ app.get('/api/auth/messages/:conv_id', isValidToken, async (req: AuthenticatedRe
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
-
-
+);
 
 // Sync Sequelize
 sequelize.sync().then(() => {

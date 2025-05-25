@@ -4,8 +4,8 @@ import {
   type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
-} from 'sequelize';
-import sequelize from '../sequelize.ts';
+} from "sequelize";
+import sequelize from "../sequelize.ts";
 
 class Message extends Model<
   InferAttributes<Message>,
@@ -42,8 +42,8 @@ Message.init(
         model: "users",
         key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     content: {
       type: DataTypes.TEXT,
