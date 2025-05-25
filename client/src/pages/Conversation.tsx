@@ -2,6 +2,7 @@ import './Conversation.css';
 import { For } from 'solid-js';
 import { io } from 'socket.io-client';
 import { createStore } from 'solid-js/store';
+import { useAuth } from '../components/AuthContext';
 
 interface Message {
   sender: string;
@@ -9,7 +10,8 @@ interface Message {
   content: string;
 }
 
-function Conversation() {
+export default function Conversation() {
+  const { user } = useAuth();
   const serverUri: string = 'http://127.0.0.1:3300';
   const socket = io(serverUri);
 
@@ -36,7 +38,9 @@ function Conversation() {
   return (
     <div>
       <div>
-        <h1>Welcome to MSGx you have a new message</h1>
+        <h1>
+          Welcome <b>{user()?.username}</b> to MSGx you have a new message
+        </h1>
         <h2>Token: {localStorage.getItem('token')}</h2>
       </div>
 
@@ -64,5 +68,3 @@ function Conversation() {
     </div>
   );
 }
-
-export default Conversation;
