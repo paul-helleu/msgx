@@ -4,6 +4,7 @@ import Conversation from './pages/Conversation';
 import { AuthProvider } from './components/AuthContext';
 import Register from './pages/Register';
 import AuthLoader from './components/AuthLoader';
+import ConversationV2 from './pages/ConversationV2';
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Router>
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/conversation2" component={ConversationV2} />
 
         <Route
           path="/conversation"

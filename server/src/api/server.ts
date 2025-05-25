@@ -7,6 +7,8 @@ import cors from 'cors';
 import User from '../database/models/User.ts';
 import { compareSync, hashSync } from 'bcrypt-ts';
 import { isValidToken, type AuthenticatedRequest } from './auth.ts';
+import Conversation from '../database/models/Conversation.ts';
+import { Op } from 'sequelize';
 
 dotenv.config();
 
@@ -59,6 +61,7 @@ app.post('/api/register', async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 });
+
 // Endpoint starting with /api/auth need "authorization: token" in req headers 
 app.get('/api/auth/user', isValidToken, async (req:AuthenticatedRequest, res) => {
   try {
@@ -72,9 +75,37 @@ app.get('/api/auth/user', isValidToken, async (req:AuthenticatedRequest, res) =>
     res.status(500).json({ message: 'Server Error', error });
   }
 });
+
 app.get('/api/auth/valid_token', isValidToken, async (req:AuthenticatedRequest, res) => {
   res.status(200).json({ message: 'Token Valid'});
 });
+
+app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = req.user.id;
+    const conversations = await Conversation.findAll({
+      where: { [Op.or]: [{ user_a: userId }, { user_b: userId }] },
+      include: [
+        { model: User, as: 'UserA', attributes: ['id', 'username'] },
+        { model: User, as: 'UserB', attributes: ['id', 'username'] },
+      ],
+      attributes: ['id'],
+    });
+
+    res.json(
+      conversations.map(c => {
+        const conv = c.toJSON() as any;
+        const otherUser = conv.UserA.id === userId ? conv.UserB : conv.UserA;
+        return { id: conv.id, user: otherUser };
+      })
+    );
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
 // Sync Sequelize
 sequelize.sync().then(() => {
   console.log('Base de données synchronisée');

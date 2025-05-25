@@ -8,12 +8,6 @@ class User extends Model<
   declare id: CreationOptional<number>;
   declare username: string;
   declare password: string;
-
-  static associate(models: any) {
-    this.hasMany(models.Conversation, { foreignKey: 'user_a' });
-    this.hasMany(models.Conversation, { foreignKey: 'user_b' });
-    this.hasOne(models.Message, { foreignKey: 'sender_id' });
-  }
 }
 
 User.init(

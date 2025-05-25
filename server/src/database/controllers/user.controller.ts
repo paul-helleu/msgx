@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import User from '../models/User.ts';
+import {User} from '../models/index';
 
 export default {
   async getAll(req: Request, res: Response) {

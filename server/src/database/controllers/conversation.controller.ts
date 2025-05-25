@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import Conversation from '../models/Conversation.ts';
+import { Conversation } from '../models/index';
 
 export default {
   async getAll(req: Request, res: Response) {

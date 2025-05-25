@@ -1,12 +1,21 @@
-import { DataTypes, Model } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+} from 'sequelize';
 import sequelize from '../sequelize.ts';
 
-class Message extends Model {
-  public id!: number;
-  public sender_id!: number;
-  public conv_id!: number;
-  public date!: Date;
-  public content!: Text;
+class Message extends Model<
+  InferAttributes<Message>,
+  InferCreationAttributes<Message>
+> {
+  declare id: CreationOptional<number>;
+  declare conv_id: number;
+  declare sender_id: number;
+  declare content: string;
+  declare createdAt?: CreationOptional<Date>;
 }
 
 Message.init(
@@ -26,7 +35,7 @@ Message.init(
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     },
-    sender_id:{
+    sender_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -35,10 +44,6 @@ Message.init(
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
-    },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
     content: {
       type: DataTypes.TEXT,
