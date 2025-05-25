@@ -90,6 +90,7 @@ app.get(
 // Sync Sequelize
 sequelize.sync().then(() => {
   console.log("Base de données synchronisée");
+  console.log("Base de données synchronisée");
 });
 
 const PORT = process.env.PORT || 3000;
