@@ -1,20 +1,32 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../sequelize.ts";
 
-class Message extends Model {
+class UserConversation extends Model {
   public id!: number;
-  public sender_id!: number;
-  public conv_id!: number;
-  public date!: Date;
-  public content!: Text;
+  public user_id!: number;
+  public conversation_id!: number;
+  static associate(models: any) {
+    this.hasMany(models.User, { foreignKey: "user_id" });
+    this.hasMany(models.Conversation, { foreignKey: "conversation_id" });
+  }
 }
 
-Message.init(
+UserConversation.init(
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "User",
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     conversation_id: {
       type: DataTypes.INTEGER,
@@ -26,25 +38,11 @@ Message.init(
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
     },
-    sender_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "User",
-        key: "id",
-      },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
-    },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
   },
   {
     sequelize,
-    tableName: "messages",
+    tableName: "user_conversations",
   }
 );
 
-export default Message;
+export default UserConversation;
