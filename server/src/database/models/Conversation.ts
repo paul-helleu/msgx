@@ -23,30 +23,14 @@ Conversation.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_a: {
+    channel_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    },
-    user_b: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
     },
   },
   {
     sequelize,
-    tableName: 'conversations',
+    tableName: "conversations",
   }
 );
 

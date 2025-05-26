@@ -25,22 +25,22 @@ Message.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    conv_id: {
+    conversation_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Conversation',
-        key: 'id',
+        model: "Conversation",
+        key: "id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     sender_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'User',
-        key: 'id',
+        model: "User",
+        key: "id",
       },
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
@@ -52,7 +52,7 @@ Message.init(
   },
   {
     sequelize,
-    tableName: 'messages',
+    tableName: "messages",
   }
 );
 

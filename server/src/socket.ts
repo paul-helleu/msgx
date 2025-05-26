@@ -1,30 +1,53 @@
 import { Server } from "socket.io";
+import type { IMessage } from "./interfaces/IMessage";
+import Message from "./database/models/Message";
+import conversationRepository from "./database/repositories/conversation.repository";
+import userRepository from "./database/repositories/user.repository";
 
 const port = Number(process.env.SERVER_SOCKET_PORT) || 3300;
 const io = new Server(port, {
   cors: { origin: process.env.SERVER_CLIENT_URI! },
 });
 
-interface Message {
-  receiver: string;
-  sender: string;
-  date: Date;
-  content: string;
-}
+const getSocketCode = (receiver: string) => receiver;
+const getConversationId = () => 1;
 
-io.on("connection", (socket) => {
-  console.log(socket.id);
-  const evIdentifier = `message/@bob`;
-  const msgExample: Message = {
-    receiver: "Bob",
-    sender: "Alice",
-    content: "Hello world!",
-    date: new Date(Date.now()),
-  };
+io.on("connection", async (socket) => {
+  socket.on("message", async (msg: IMessage) => {
+    console.log(msg);
+    socket.emit(msg.receiver, msg);
 
-  socket.emit(evIdentifier, msgExample);
-  socket.on(evIdentifier, (msg) => {
-    // store inside the database
-    return socket.emit(evIdentifier, msg); // successfully saved into the database
+    if (msg.sender === msg.receiver) {
+      // error
+      return;
+    }
+
+    const sender = await userRepository.findByUsername(msg.sender);
+    if (sender === null) {
+      // error
+      return;
+    }
+
+    const receiver = await userRepository.findByUsername(msg.sender);
+    if (receiver === null) {
+      // error
+      return;
+    }
+    // const receiver = await messageRepository.
+
+    const [conversation, created] =
+      await conversationRepository.findOrCreateConversationBySenderAndReceiverIds(
+        receiver.id,
+        sender.id
+      );
+
+    Message.create({
+      sender_id: sender.id,
+      conv_id: conversation.id,
+      date: new Date(Date.now()),
+      content: msg.content,
+    })
+      .then((res) => socket.emit(getSocketCode(msg.receiver), msg))
+      .catch((err) => socket.emit(getSocketCode(msg.sender), err));
   });
 });
