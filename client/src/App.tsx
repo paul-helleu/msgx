@@ -1,11 +1,3 @@
-import { Route, Router } from '@solidjs/router';
-import Login from './pages/Login';
-import Conversation from './pages/Conversation';
-import { AuthProvider } from './components/AuthContext';
-import Register from './pages/Register';
-import AuthGate from './components/AuthGate';
-
-export default function App() {
 import './App.css';
 import { createSignal, For } from 'solid-js';
 import { io } from 'socket.io-client';
