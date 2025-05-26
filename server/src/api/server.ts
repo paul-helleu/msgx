@@ -7,12 +7,11 @@ import cors from "cors";
 import User from "../database/models/User.ts";
 import { compareSync, hashSync } from "bcrypt-ts";
 import { isValidToken, type AuthenticatedRequest } from "./auth.ts";
-import Conversation from "../database/models/Conversation.ts";
 import { Op } from "sequelize";
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "SECRET_KEY";
+const JWT_SECRET = process.env.JWT_SECRET || "MY_SECRET";
 
 const app = express();
 app.use(express.json());
@@ -52,13 +51,12 @@ app.post("/api/register", async (req, res) => {
   const { username, password }: { username: string; password: string } =
     req.body;
 
+  const existingUser = await User.findOne({ where: { username } });
+  if (existingUser !== null) {
+    res.status(409).json({ message: "Registration error" });
+  }
+
   try {
-    const existingUser = await User.findOne({ where: { username } });
-
-    if (existingUser) {
-      res.status(409).json({ message: "Registration error" });
-    }
-
     await User.create({ username, password: hashSync(password, 10) });
     res.status(201).json({ message: "success" });
   } catch (error) {
@@ -92,33 +90,33 @@ app.get(
   }
 );
 
-app.get(
-  "/api/auth/conversations",
-  isValidToken,
-  async (req: AuthenticatedRequest, res) => {
-    try {
-      const userId = req.user.id;
-      const conversations = await Conversation.findAll({
-        where: { [Op.or]: [{ user_a: userId }, { user_b: userId }] },
-        include: [
-          { model: User, as: "UserA", attributes: ["id", "username"] },
-          { model: User, as: "UserB", attributes: ["id", "username"] },
-        ],
-        attributes: ["id"],
-      });
+// app.get(
+//   "/api/auth/conversations",
+//   isValidToken,
+//   async (req: AuthenticatedRequest, res) => {
+//     try {
+//       const userId = req.user.id;
+//       const conversations = await Conversation.findAll({
+//         where: { [Op.or]: [{ user_a: userId }, { user_b: userId }] },
+//         include: [
+//           { model: User, as: "UserA", attributes: ["id", "username"] },
+//           { model: User, as: "UserB", attributes: ["id", "username"] },
+//         ],
+//         attributes: ["id"],
+//       });
 
-      res.json(
-        conversations.map((c) => {
-          const conv = c.toJSON() as any;
-          const otherUser = conv.UserA.id === userId ? conv.UserB : conv.UserA;
-          return { id: conv.id, user: otherUser };
-        })
-      );
-    } catch {
-      res.status(500).json({ error: "Internal server error" });
-    }
-  }
-);
+//       res.json(
+//         conversations.map((c) => {
+//           const conv = c.toJSON() as any;
+//           const otherUser = conv.UserA.id === userId ? conv.UserB : conv.UserA;
+//           return { id: conv.id, user: otherUser };
+//         })
+//       );
+//     } catch {
+//       res.status(500).json({ error: "Internal server error" });
+//     }
+//   }
+// );
 
 // Sync Sequelize
 sequelize.sync().then(() => {
@@ -127,6 +125,4 @@ sequelize.sync().then(() => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
+app.listen(PORT);

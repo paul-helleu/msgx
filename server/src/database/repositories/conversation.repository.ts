@@ -1,4 +1,4 @@
-import Conversation from "../models/Conversation";
+import { Conversation } from "../models";
 
 export default {
   async findOrCreateBySenderAndReceiverIds(
@@ -6,17 +6,12 @@ export default {
     receiverId: number
   ) {
     return Conversation.findOrCreate({
-      where: {
-        user_a: senderId,
-        user_b: receiverId,
-      },
+      where: {},
     });
   },
   async findByChannelId(channelId: number) {
     return Conversation.findOne({
-      where: {
-        channelId: channelId,
-      },
+      where: {},
     });
   },
 };

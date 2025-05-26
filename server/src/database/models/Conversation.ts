@@ -7,12 +7,13 @@ import {
 } from "sequelize";
 import sequelize from "../sequelize.ts";
 
-class Conversation extends Model {
-  public id!: number;
-  public channel_id!: number;
-  static associate(models: any) {
-    this.hasMany(models.Message, { foreignKey: "conv_id" });
-  }
+class Conversation extends Model<
+  InferAttributes<Conversation>,
+  InferCreationAttributes<Conversation>
+> {
+  declare id: CreationOptional<number>;
+  declare channel_id: string;
+  declare createdAt?: CreationOptional<Date>;
 }
 
 Conversation.init(
@@ -23,7 +24,7 @@ Conversation.init(
       autoIncrement: true,
     },
     channel_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },

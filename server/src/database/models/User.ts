@@ -11,6 +11,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
   declare username: string;
   declare password: string;
+  declare createdAt?: CreationOptional<Date>;
 }
 
 User.init(
