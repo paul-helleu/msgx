@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   DataTypes,
   Model,
@@ -6,9 +5,6 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
 } from "sequelize";
-=======
-import { DataTypes, Model } from "sequelize";
->>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
 import sequelize from "../sequelize.ts";
 
 class Message extends Model<
@@ -58,10 +54,7 @@ Message.init(
   {
     sequelize,
     tableName: "messages",
-<<<<<<< HEAD
     timestamps: true,
-=======
->>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
   }
 );
 

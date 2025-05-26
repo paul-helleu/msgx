@@ -5,13 +5,6 @@ class UserConversation extends Model {
   public id!: number;
   public user_id!: number;
   public conversation_id!: number;
-<<<<<<< HEAD
-=======
-  static associate(models: any) {
-    this.hasMany(models.User, { foreignKey: "user_id" });
-    this.hasMany(models.Conversation, { foreignKey: "conversation_id" });
-  }
->>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
 }
 
 UserConversation.init(
