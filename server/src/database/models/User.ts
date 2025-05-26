@@ -1,4 +1,10 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+} from "sequelize";
 import sequelize from "../sequelize.ts";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {

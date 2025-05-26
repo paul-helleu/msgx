@@ -7,13 +7,13 @@ import {
 } from "sequelize";
 import sequelize from "../sequelize.ts";
 
-class Conversation extends Model<
-  InferAttributes<Conversation>,
-  InferCreationAttributes<Conversation>
-> {
-  declare id: CreationOptional<number>;
-  declare user_a: number;
-  declare user_b: number;
+class Conversation extends Model {
+  public id!: number;
+  public user_a!: number;
+  public user_b!: number;
+  static associate(models: any) {
+    this.hasMany(models.Message, { foreignKey: "conv_id" });
+  }
 }
 
 Conversation.init(
@@ -23,25 +23,9 @@ Conversation.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    user_a: {
+    channel_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: "Users",
-        key: "id",
-      },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
-    },
-    user_b: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "Users",
-        key: "id",
-      },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
     },
   },
   {

@@ -8,4 +8,11 @@ export default {
       },
     });
   },
+  async findByUserId(id: number) {
+    return User.findOne({
+      where: {
+        id,
+      },
+    });
+  },
 };

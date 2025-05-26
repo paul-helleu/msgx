@@ -25,7 +25,7 @@ Message.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    conv_id: {
+    conversation_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
