@@ -7,11 +7,18 @@ import cors from "cors";
 import User from "../database/models/User.ts";
 import { compareSync, hashSync } from "bcrypt-ts";
 import { isValidToken, type AuthenticatedRequest } from "./auth.ts";
+<<<<<<< HEAD
 import { Op } from "sequelize";
 
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "MY_SECRET";
+=======
+
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || "SECRET_KEY";
+>>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
 
 const app = express();
 app.use(express.json());
@@ -41,6 +48,7 @@ app.post("/api/login", async (req, res) => {
       res
         .status(200)
         .json({ message: "Authentification Succedeed", token: token });
+<<<<<<< HEAD
     }
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -82,6 +90,48 @@ app.get(
   }
 );
 
+=======
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+app.post("/api/register", async (req, res) => {
+  const { username, password }: { username: string; password: string } =
+    req.body;
+
+  try {
+    const existingUser = await User.findOne({ where: { username } });
+
+    if (existingUser) {
+      res.status(409).json({ message: "Registration error" });
+    }
+
+    await User.create({ username, password: hashSync(password, 10) });
+    res.status(201).json({ message: "success" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+// Endpoint starting with /api/auth need "authorization: token" in req headers
+app.get(
+  "/api/auth/user",
+  isValidToken,
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await User.findOne({ where: { id: userId } });
+      if (user) {
+        const { id, username } = user.toJSON();
+        res.json({ id, username });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Server Error", error });
+    }
+  }
+);
+>>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
 app.get(
   "/api/auth/valid_token",
   isValidToken,
@@ -89,6 +139,7 @@ app.get(
     res.status(200).json({ message: "Token Valid" });
   }
 );
+<<<<<<< HEAD
 
 // app.get(
 //   "/api/auth/conversations",
@@ -118,6 +169,8 @@ app.get(
 //   }
 // );
 
+=======
+>>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
 // Sync Sequelize
 sequelize.sync().then(() => {
   console.log("Base de données synchronisée");
@@ -125,4 +178,10 @@ sequelize.sync().then(() => {
 
 const PORT = process.env.PORT || 3000;
 
+<<<<<<< HEAD
 app.listen(PORT);
+=======
+app.listen(PORT, () => {
+  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+});
+>>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715

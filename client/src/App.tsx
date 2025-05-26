@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Route, Router } from '@solidjs/router';
 import Login from './pages/Login';
 import Conversation from './pages/Conversation';
@@ -5,8 +6,34 @@ import { AuthProvider } from './components/AuthContext';
 import Register from './pages/Register';
 import AuthLoader from './components/AuthLoader';
 import ConversationV2 from './pages/ConversationV2';
+=======
+import './App.css';
+import { createSignal, For } from 'solid-js';
+import { io } from 'socket.io-client';
+import { createStore } from 'solid-js/store';
+import type { Message } from './interfaces/Message';
 
-export default function App() {
+function App() {
+  const serverUri = 'http://127.0.0.1:3300';
+  const username = 'Bob';
+  const destinataire = 'Alice';
+
+  const socket = io(serverUri);
+
+  const [store, setStore] = createStore({
+    messages: [] as Message[],
+  });
+  const [messageContent, setMessageContent] = createSignal<string>('');
+
+  const sendMsg = (msg: Message) => {
+    socket.emit('message', msg);
+  };
+
+  socket.on(username, (msg) => {
+    setStore('messages', (messages) => [...messages, msg]);
+  });
+>>>>>>> 0ed518c0d7ed3533a281385c21847b1604254715
+
   return (
     <AuthProvider>
       <Router>
@@ -33,5 +60,38 @@ export default function App() {
         />
       </Router>
     </AuthProvider>
+    <div>
+      <h1>Welcome to MSGx</h1>
+
+      <For each={store.messages}>
+        {(item, index) => (
+          <div>
+            <h3>{item.sender}</h3>
+            <div>
+              <p>{item.content}</p>
+            </div>
+          </div>
+        )}
+      </For>
+
+      <label>Entrer votre message</label>
+      <input
+        type="text"
+        name="message"
+        onInput={(e) => setMessageContent(e.target.value)}
+      />
+      <button
+        type="button"
+        onclick={() => {
+          sendMsg({
+            content: messageContent(),
+            receiver: username,
+            sender: destinataire,
+          });
+        }}
+      >
+        Envoyer
+      </button>
+    </div>
   );
 }
