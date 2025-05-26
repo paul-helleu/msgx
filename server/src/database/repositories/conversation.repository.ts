@@ -11,7 +11,9 @@ export default {
   },
   async findByChannelId(channelId: number) {
     return Conversation.findOne({
-      where: {},
+      where: {
+        channel_id: channelId,
+      },
     });
   },
 };
