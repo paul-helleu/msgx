@@ -9,8 +9,7 @@ import sequelize from "../sequelize.ts";
 
 class Conversation extends Model {
   public id!: number;
-  public user_a!: number;
-  public user_b!: number;
+  public channel_id!: number;
   static associate(models: any) {
     this.hasMany(models.Message, { foreignKey: "conv_id" });
   }
