@@ -1,4 +1,4 @@
-import Message from "../models/Message";
+import { Conversation, Message } from "../models";
 
 export default {
   async findAll(conversationId: number, limit: number | undefined = undefined) {

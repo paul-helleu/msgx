@@ -11,7 +11,7 @@ import { UserConversation, Conversation, User, Message } from '../database/model
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || "SECRET_KEY";
+const JWT_SECRET = process.env.JWT_SECRET || "MY_SECRET";
 
 const app = express();
 app.use(express.json());
@@ -51,13 +51,12 @@ app.post("/api/register", async (req, res) => {
   const { username, password }: { username: string; password: string } =
     req.body;
 
+  const existingUser = await User.findOne({ where: { username } });
+  if (existingUser !== null) {
+    res.status(409).json({ message: "Registration error" });
+  }
+
   try {
-    const existingUser = await User.findOne({ where: { username } });
-
-    if (existingUser) {
-      res.status(409).json({ message: "Registration error" });
-    }
-
     await User.create({ username, password: hashSync(password, 10) });
     res.status(201).json({ message: "success" });
   } catch (error) {
@@ -146,6 +145,4 @@ sequelize.sync().then(() => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-});
+app.listen(PORT);

@@ -53,6 +53,7 @@ Message.init(
   {
     sequelize,
     tableName: "messages",
+    timestamps: true,
   }
 );
 
