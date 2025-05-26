@@ -12,8 +12,8 @@ class Conversation extends Model<
   InferCreationAttributes<Conversation>
 > {
   declare id: CreationOptional<number>;
-  declare user_a: number;
-  declare user_b: number;
+  declare channel_id: string;
+  declare createdAt?: CreationOptional<Date>;
 }
 
 Conversation.init(
@@ -24,7 +24,7 @@ Conversation.init(
       autoIncrement: true,
     },
     channel_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },

@@ -12,12 +12,12 @@ class Message extends Model<
   InferCreationAttributes<Message>
 > {
   declare id: CreationOptional<number>;
-  declare conv_id: number;
+  declare conversation_id: number;
   declare sender_id: number;
   declare content: string;
   declare createdAt?: CreationOptional<Date>;
+  declare updatedAt?: CreationOptional<Date>;
 }
-
 Message.init(
   {
     id: {

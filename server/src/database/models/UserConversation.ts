@@ -1,14 +1,10 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, type InferAttributes, type InferCreationAttributes } from "sequelize";
 import sequelize from "../sequelize.ts";
 
-class UserConversation extends Model {
+class UserConversation extends Model<InferAttributes<UserConversation>, InferCreationAttributes<UserConversation>> {
   public id!: number;
   public user_id!: number;
   public conversation_id!: number;
-  static associate(models: any) {
-    this.hasMany(models.User, { foreignKey: "user_id" });
-    this.hasMany(models.Conversation, { foreignKey: "conversation_id" });
-  }
 }
 
 UserConversation.init(
