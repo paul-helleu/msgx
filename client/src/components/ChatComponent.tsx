@@ -32,7 +32,7 @@ export default function ChatComponent({ convId }: ChatComponentProps) {
           {(msg) => (
             <div
               class={`max-w-xs px-4 py-2 rounded-lg shadow text-sm ${
-                msg.Sender.id === user().id
+                msg.Sender.id === user()?.id
                   ? 'bg-indigo-500 text-white self-end ml-auto'
                   : 'bg-gray-200 text-gray-900 self-start mr-auto'
               }`}

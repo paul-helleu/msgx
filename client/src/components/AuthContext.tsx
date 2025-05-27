@@ -17,7 +17,7 @@ export interface AuthContextType {
   loginError: Accessor<string>;
   passwordError: Accessor<string>;
   error: Accessor<string>;
-  user: Accessor<User>;
+  user: Accessor<User | null>;
   fetchUserData: () => Promise<void>;
 }
 
