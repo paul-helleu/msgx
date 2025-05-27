@@ -1,6 +1,7 @@
 import {
   DataTypes,
   Model,
+  type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
 } from "sequelize";
@@ -10,9 +11,9 @@ class UserConversation extends Model<
   InferAttributes<UserConversation>,
   InferCreationAttributes<UserConversation>
 > {
-  public id!: number;
-  public user_id!: number;
-  public conversation_id!: number;
+  declare id: CreationOptional<number>;
+  declare user_id: number;
+  declare conversation_id: number;
 }
 
 UserConversation.init(

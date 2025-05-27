@@ -4,6 +4,11 @@ import ConversationController from "../controllers/conversation.controller.ts";
 import MessageController from "../controllers/message.controller.ts";
 import userRepository from "../repositories/user.repository.ts";
 import conversationRepository from "../repositories/conversation.repository.ts";
+import messageRepository from "../repositories/message.repository.ts";
+import Message from "../models/Message.ts";
+import Conversation from "../models/Conversation.ts";
+import { UUIDV4 } from "sequelize";
+import UserConversation from "../models/UserConversation.ts";
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
@@ -22,8 +27,9 @@ router.get("/messages", (req, res, next) => {
   }
 });
 
-router.post("/users/@me/channels", (req, res, next) => {
+router.post("/conversations/create", async (req, res, next) => {
   // check authentification
+  const senderId = 1;
 
   const recipients: [] | null = req.body?.recipients;
   if (
@@ -43,8 +49,9 @@ router.post("/users/@me/channels", (req, res, next) => {
     return;
   }
 
-  recipients.forEach((recipientId) => {
-    if (!Number.isInteger(recipientId)) {
+  recipients.forEach(async (recipientId: string) => {
+    const recipientIdNumber = parseInt(recipientId, 10);
+    if (!Number.isNaN(recipientIdNumber)) {
       res.status(400).json({
         message: "Recipients must contains recipientIds",
         errors: {
@@ -56,11 +63,41 @@ router.post("/users/@me/channels", (req, res, next) => {
       });
       return;
     }
+
+    const recipient = await userRepository.findById(recipientIdNumber);
+    if (recipient === null) {
+      res.json({
+        message: `${recipientIdNumber} is not a valid recipientId`,
+        errors: {
+          sender: {
+            code: "",
+            message: "",
+          },
+        },
+      });
+      return;
+    }
+  });
+
+  const newConversation = await Conversation.create({
+    channel_id: crypto.randomUUID(),
+  });
+  await UserConversation.create({
+    conversation_id: newConversation.id,
+    user_id: senderId,
+  });
+
+  recipients.forEach(async (recipientId) => {
+    await UserConversation.create({
+      conversation_id: newConversation.id,
+      user_id: recipientId,
+    });
   });
 });
 
 router.post("/conversations/:channelId/messages", async (req, res, next) => {
   // check authentification
+  const senderId = 1;
 
   const channelId = parseInt(req.params.channelId, 10);
   if (Number.isNaN(channelId)) {
@@ -104,7 +141,11 @@ router.post("/conversations/:channelId/messages", async (req, res, next) => {
     return;
   }
 
-  // create message and link it to the conversation
+  const message = await Message.create({
+    content,
+    conversation_id: conversation.id,
+    sender_id: senderId,
+  });
 });
 
 export default router;
