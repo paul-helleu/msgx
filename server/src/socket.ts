@@ -12,26 +12,18 @@ const io = new Server(port, {
 const getSocketCode = (receiver: string) => receiver;
 const getConversationId = () => 1;
 
-io.on("connection", async (socket) => {
-  socket.on("message", async (msg: IMessage) => {
-    console.log(msg);
-    socket.emit(msg.receiver, msg);
-
-    if (msg.sender === msg.receiver) {
-      // error
-      return;
-    }
-
-    const sender = await userRepository.findByUsername(msg.sender);
-    if (sender === null) {
-      // error
-      return;
-    }
-
-    const receiver = await userRepository.findByUsername(msg.sender);
-    if (receiver === null) {
-      // error
-      return;
-    }
+io.on("connection", (socket) => {
+  socket.on("joinChannel", (channelId) => {
+    socket.join(channelId);
   });
+
+  socket.on("sendMessage", ({ channelId, message, senderId }) => {
+    const payload = {
+      channelId,
+      senderId,
+      message,
+    };
+    io.to(channelId).emit("newMessage", payload);
+  });
+  // socket.on("channels/1", (msg: IMessage) => {});
 });
