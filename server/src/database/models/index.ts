@@ -4,7 +4,7 @@ import Message from "./Message";
 import UserConversation from "./UserConversation";
 
 // Message
-Message.belongsTo(User, { foreignKey: "sender_id", as: "sender" });
+Message.belongsTo(User, { foreignKey: "sender_id", as: "Sender" });
 Message.belongsTo(Conversation, { foreignKey: "conversation_id" });
 
 // Conversation

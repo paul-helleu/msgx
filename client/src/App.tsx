@@ -12,8 +12,14 @@ export default function App() {
       <Router>
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/conversation2" component={ConversationV2} />
-
+        <Route
+          path="/conversation2"
+          component={() => (
+            <AuthLoader>
+              <ConversationV2 />
+            </AuthLoader>
+          )}
+        />
         <Route
           path="/conversation"
           component={() => (

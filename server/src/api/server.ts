@@ -7,7 +7,7 @@ import cors from 'cors';
 import { compareSync, hashSync } from 'bcrypt-ts';
 import { isValidToken, type AuthenticatedRequest } from './auth.ts';
 import { Op } from 'sequelize';
-import { UserConversation, Conversation, User } from '../database/models/index.ts';
+import { UserConversation, Conversation, User, Message } from '../database/models/index.ts';
 
 dotenv.config();
 
@@ -110,6 +110,25 @@ app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedReques
       attributes: ['conversation_id']
     });
     res.json(conversations)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/auth/messages/:conv_id', isValidToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const convId = req.params.conv_id;
+    const messages = await Message.findAll({
+      where: { conversation_id: convId },
+      include: [
+        {model: User, attributes: ['id', 'username'], as:"Sender"},
+        {model: Conversation, attributes: ['id', 'channel_id']},
+      ],
+      attributes: ['createdAt', 'content'],
+      order: [['createdAt', 'ASC']],
+    });
+    res.json(messages)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });

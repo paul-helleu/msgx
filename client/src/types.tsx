@@ -13,3 +13,12 @@ export interface UserConversation {
   User: User;
   Conversation: User;
 }
+
+export interface Message {
+  id: number;
+  Conversation: Conversation;
+  Sender: User;
+  content: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
