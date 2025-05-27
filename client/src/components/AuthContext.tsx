@@ -67,8 +67,9 @@ export function AuthProvider(props: { children: JSX.Element }) {
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) {
-      setError('Register failed');
+      setError("Ce nom d'utilisateur est déjà pris");
       setLoginError('red');
+      throw new Error('Login failed');
     } else {
       await login(username, password);
     }
