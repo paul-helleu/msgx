@@ -5,5 +5,11 @@ export interface User {
 
 export interface Conversation {
   id: number;
-  user: User;
+  channel_id: User;
+}
+
+export interface UserConversation {
+  id: number;
+  User: User;
+  Conversation: User;
 }

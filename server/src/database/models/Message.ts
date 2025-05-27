@@ -29,7 +29,7 @@ Message.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Conversation",
+        model: "conversations",
         key: "id",
       },
       onUpdate: "CASCADE",
@@ -39,7 +39,7 @@ Message.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "User",
+        model: "users",
         key: "id",
       },
       onUpdate: 'CASCADE',

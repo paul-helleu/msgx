@@ -4,11 +4,10 @@ import router from '../database/routes/index.ts';
 import sequelize from '../database/sequelize.ts';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
-import User from '../database/models/User.ts';
 import { compareSync, hashSync } from 'bcrypt-ts';
 import { isValidToken, type AuthenticatedRequest } from './auth.ts';
-import Conversation from '../database/models/Conversation.ts';
 import { Op } from 'sequelize';
+import { UserConversation, Conversation, User } from '../database/models/index.ts';
 
 dotenv.config();
 
@@ -88,29 +87,34 @@ app.get('/api/auth/valid_token', isValidToken, async (req:AuthenticatedRequest, 
   res.status(200).json({ message: 'Token Valid'});
 });
 
-// app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedRequest, res) => {
-//   try {
-//     const userId = req.user.id;
-//     const conversations = await Conversation.findAll({
-//       where: { [Op.or]: [{ user_a: userId }, { user_b: userId }] },
-//       include: [
-//         { model: User, as: 'UserA', attributes: ['id', 'username'] },
-//         { model: User, as: 'UserB', attributes: ['id', 'username'] },
-//       ],
-//       attributes: ['id'],
-//     });
-
-//     res.json(
-//       conversations.map(c => {
-//         const conv = c.toJSON() as any;
-//         const otherUser = conv.UserA.id === userId ? conv.UserB : conv.UserA;
-//         return { id: conv.id, user: otherUser };
-//       })
-//     );
-//   } catch {
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
+app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedRequest, res) => {
+  try {
+    const userId = req.user.id;
+    const userConv = await UserConversation.findAll({
+      where: { user_id: userId },
+      attributes: ['conversation_id']
+    });
+    const conversations = await UserConversation.findAll({
+      where: {
+        conversation_id: {
+          [Op.in]: userConv.map(c => c.get('conversation_id')),
+        },
+        user_id: {
+          [Op.ne]: userId,
+        },
+      },
+      include: [
+        {model: User, attributes: ['id', 'username']},
+        {model: Conversation, attributes: ['id', 'channel_id']},
+      ],
+      attributes: ['conversation_id']
+    });
+    res.json(conversations)
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 

@@ -1,8 +1,10 @@
 import { createSignal, For, onMount } from 'solid-js';
-import type { Conversation } from '../types';
+import type { UserConversation } from '../types';
 
 export default function ConversationList() {
-  const [conversations, setConversations] = createSignal<Conversation[]>([]);
+  const [conversations, setConversations] = createSignal<UserConversation[]>(
+    []
+  );
 
   onMount(async () => {
     const res = await fetch(`http://localhost:3000/api/auth/conversations`, {
@@ -23,7 +25,7 @@ export default function ConversationList() {
         <For each={conversations()}>
           {(conversation) => (
             <li class="flex items-center justify-between hover:bg-gray-100 p-2 rounded cursor-pointer">
-              <span>{conversation.user.username}</span>
+              <span>{conversation.User.username}</span>
             </li>
           )}
         </For>
