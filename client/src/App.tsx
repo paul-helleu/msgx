@@ -24,7 +24,7 @@ export default function App() {
           path="/conversation"
           component={() => (
             <AuthLoader>
-              <Conversation />
+              <Chat />
             </AuthLoader>
           )}
         />
@@ -33,7 +33,7 @@ export default function App() {
           path="/"
           component={() => (
             <AuthLoader>
-              <Conversation />
+              <Chat />
             </AuthLoader>
           )}
         />

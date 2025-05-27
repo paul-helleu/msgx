@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import router from "../database/routes/index.ts";
 import sequelize from "../database/sequelize.ts";
 import jwt from "jsonwebtoken";
@@ -13,8 +12,6 @@ import {
   User,
   Message,
 } from "../database/models/index.ts";
-
-dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || "MY_SECRET";
 
