@@ -16,8 +16,8 @@ export interface UserConversation {
 
 export interface Message {
   id: number;
-  Conversation: Conversation;
-  Sender: User;
+  conversation: Conversation;
+  sender: User;
   content: string;
   createdAt: Date;
   updatedAt?: Date;

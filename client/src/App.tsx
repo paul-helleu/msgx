@@ -1,10 +1,10 @@
 import { Route, Router } from '@solidjs/router';
 import Login from './pages/Login';
-import Conversation from './pages/Conversation';
 import { AuthProvider } from './components/AuthContext';
 import Register from './pages/Register';
 import AuthLoader from './components/AuthLoader';
-import ConversationV2 from './pages/ConversationV2';
+import Chat from './pages/Chat';
+import Conversation from './pages/Conversation';
 
 export default function App() {
   return (
@@ -16,7 +16,7 @@ export default function App() {
           path="/conversation2"
           component={() => (
             <AuthLoader>
-              <ConversationV2 />
+              <Chat />
             </AuthLoader>
           )}
         />

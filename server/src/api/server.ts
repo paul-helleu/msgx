@@ -1,13 +1,18 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import router from '../database/routes/index.ts';
-import sequelize from '../database/sequelize.ts';
-import jwt from 'jsonwebtoken';
-import cors from 'cors';
-import { compareSync, hashSync } from 'bcrypt-ts';
-import { isValidToken, type AuthenticatedRequest } from './auth.ts';
-import { Op } from 'sequelize';
-import { UserConversation, Conversation, User, Message } from '../database/models/index.ts';
+import express from "express";
+import dotenv from "dotenv";
+import router from "../database/routes/index.ts";
+import sequelize from "../database/sequelize.ts";
+import jwt from "jsonwebtoken";
+import cors from "cors";
+import { compareSync, hashSync } from "bcrypt-ts";
+import { isValidToken, type AuthenticatedRequest } from "./auth.ts";
+import { Op } from "sequelize";
+import {
+  UserConversation,
+  Conversation,
+  User,
+  Message,
+} from "../database/models/index.ts";
 
 dotenv.config();
 
@@ -64,7 +69,7 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// Endpoint starting with /api/auth need "authorization: token" in req headers 
+// Endpoint starting with /api/auth need "authorization: token" in req headers
 app.get(
   "/api/auth/user",
   isValidToken,
@@ -90,51 +95,59 @@ app.get(
   }
 );
 
-app.get('/api/auth/conversations', isValidToken, async (req: AuthenticatedRequest, res) => {
-  try {
-    const userId = req.user.id;
-    const userConv = await UserConversation.findAll({
-      where: { user_id: userId },
-      attributes: ['conversation_id']
-    });
-    const conversations = await UserConversation.findAll({
-      where: {
-        conversation_id: {
-          [Op.in]: userConv.map(c => c.get('conversation_id')),
+app.get(
+  "/api/auth/conversations",
+  isValidToken,
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const userConv = await UserConversation.findAll({
+        where: { user_id: userId },
+        attributes: ["conversation_id"],
+      });
+      const conversations = await UserConversation.findAll({
+        where: {
+          conversation_id: {
+            [Op.in]: userConv.map((c) => c.get("conversation_id")),
+          },
+          user_id: {
+            [Op.ne]: userId,
+          },
         },
-        user_id: {
-          [Op.ne]: userId,
-        },
-      },
-      include: [
-        {model: User, attributes: ['id', 'username']},
-        {model: Conversation, attributes: ['id', 'channel_id']},
-      ],
-      attributes: ['conversation_id']
-    });
-    res.json(conversations)
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+        include: [
+          { model: User, attributes: ["id", "username"] },
+          { model: Conversation, attributes: ["id", "channel_id"] },
+        ],
+        attributes: ["conversation_id"],
+      });
+      res.json(conversations);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
-});
+);
 
-app.get('/api/auth/messages/:conv_id', isValidToken, async (req: AuthenticatedRequest, res) => {
-  try {
-    const convId = req.params.conv_id;
-    const messages = await Message.findAll({
-      where: { conversation_id: convId },
-      include: [
-        {model: User, attributes: ['id', 'username'], as:"Sender"},
-        {model: Conversation, attributes: ['id', 'channel_id']},
-      ],
-      attributes: ['createdAt', 'content'],
-      order: [['createdAt', 'ASC']],
-    });
-    res.json(messages)
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+app.get(
+  "/api/auth/messages/:conv_id",
+  isValidToken,
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const convId = req.params.conv_id;
+      const messages = await Message.findAll({
+        where: { conversation_id: convId },
+        include: [
+          { model: User, attributes: ["id", "username"], as: "Sender" },
+          { model: Conversation, attributes: ["id", "channel_id"] },
+        ],
+        attributes: ["createdAt", "content"],
+        order: [["createdAt", "ASC"]],
+      });
+      res.json(messages);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 );
 

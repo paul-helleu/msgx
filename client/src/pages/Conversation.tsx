@@ -1,70 +1,55 @@
-import './Conversation.css';
 import { For } from 'solid-js';
-import { io } from 'socket.io-client';
-import { createStore } from 'solid-js/store';
-import { useAuth } from '../components/AuthContext';
+import type { Message } from '../interfaces/Message';
 
-interface Message {
-  sender: string;
-  receiver: string;
-  content: string;
-}
-
-export default function Conversation() {
-  const { user } = useAuth();
-  const serverUri: string = 'http://127.0.0.1:3300';
-  const socket = io(serverUri);
-
-  const username = 'Bob'; // destinataire
-  const msgExample: Message = {
-    content: 'Hello BOB',
-    receiver: 'Bob',
-    sender: username,
-  };
-
-  const evIdentifier = `message/@${username.toLowerCase()}`;
-  const [store, setStore] = createStore({
-    messages: [] as Message[],
-  });
-
-  const sendMsg = (msg: Message) => {
-    socket.emit(evIdentifier, msg);
-  };
-
-  socket.on(evIdentifier, (msg) => {
-    setStore('messages', (messages) => [...messages, msg]);
-  });
+export default function Conversation(props: {
+  messages: Message[];
+  sendMessage: Function;
+}) {
+  const messages = () => props.messages as Message[];
+  const sendMessage = (msg: Message) => props.sendMessage(msg);
 
   return (
-    <div>
-      <div>
-        <h1>
-          Welcome <b>{user()?.username}</b> to MSGx you have a new message
-        </h1>
-        <h2>Token: {localStorage.getItem('token')}</h2>
+    <main class="flex-1 flex flex-col justify-between bg-white p-4">
+      <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
+        <For each={messages()}>
+          {(msg) => (
+            <div
+              class={`max-w-xs px-4 py-2 rounded-lg shadow text-sm ${
+                msg.sender === 'Moi'
+                  ? 'bg-indigo-500 text-white self-end ml-auto'
+                  : 'bg-gray-200 text-gray-900 self-start mr-auto'
+              }`}
+            >
+              <p>{msg.content}</p>
+              <span class="text-xs opacity-60 block mt-1">
+                {new Date(msg.createdAt).toISOString()}
+              </span>
+            </div>
+          )}
+        </For>
       </div>
 
-      <For each={store.messages}>
-        {(item, index) => (
-          <div>
-            <h3>{item.sender}</h3>
-            <div>
-              <p>{item.content}</p>
-            </div>
-          </div>
-        )}
-      </For>
-
-      <label>Entrer votre message</label>
-      <input type="text" name="message" />
-      <button
-        type="button"
-        onclick={() => {
-          sendMsg(msgExample);
-        }}
-      >
-        Envoyer
-      </button>
-    </div>
+      <div class="flex items-center gap-2 border-t pt-3">
+        <input
+          type="text"
+          placeholder="Écrivez un message..."
+          class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:border-indigo-300"
+        />
+        <button
+          onClick={() => {
+            const msg = {
+              id: 3,
+              content: 'Hello',
+              sender: 'Moi',
+              createdAt: new Date(Date.now()),
+            };
+            sendMessage(msg);
+          }}
+          class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+        >
+          Envoyer
+        </button>
+      </div>
+    </main>
   );
 }

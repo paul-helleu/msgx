@@ -1,41 +1,41 @@
 import { createSignal, For, onMount } from 'solid-js';
-import type { Message } from '../types';
+import type { Message } from '../interfaces/Message';
 import { useAuth } from './AuthContext';
 
-type ChatComponentProps = {
+export default function ChatComponent({
+  convId,
+  messages,
+}: {
   convId: number;
-};
-
-export default function ChatComponent({ convId }: ChatComponentProps) {
-  const [messages, setMessages] = createSignal<Message[]>([]);
-  const { user } = useAuth();
-
-  onMount(async () => {
-    const res = await fetch(
-      `http://localhost:3000/api/auth/messages/` + convId,
-      {
-        headers: {
-          authorization: `${localStorage.getItem('token')}`,
-        },
-      }
-    );
-    if (res.ok) {
-      const data = await res.json();
-      setMessages(data);
-    }
+  messages: Message[];
+}) {
+  onMount(() => {
+    fetch(`http://localhost:3000/api/auth/messages/${convId}`, {
+      headers: {
+        authorization: `${localStorage.getItem('token')}`,
+      },
+    })
+      .then((res) => {
+        res.json().then((json) => {
+          //
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   return (
     <>
       <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
-        <For each={messages()}>
+        <For each={messages}>
           {(msg) => (
             <div
-              class={`max-w-xs px-4 py-2 rounded-lg shadow text-sm ${
-                msg.Sender.id === user()?.id
-                  ? 'bg-indigo-500 text-white self-end ml-auto'
-                  : 'bg-gray-200 text-gray-900 self-start mr-auto'
-              }`}
+            // class={`max-w-xs px-4 py-2 rounded-lg shadow text-sm ${
+            //   msg.sender === user()?.id
+            //     ? 'bg-indigo-500 text-white self-end ml-auto'
+            //     : 'bg-gray-200 text-gray-900 self-start mr-auto'
+            // }`}
             >
               <p>{msg.content}</p>
               <span class="text-xs opacity-60 block mt-1">

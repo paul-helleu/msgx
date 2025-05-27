@@ -1,5 +1,5 @@
 import { createSignal, For, onMount } from 'solid-js';
-import type { UserConversation } from '../types';
+import type { UserConversation } from '../interfaces/types';
 
 export default function ConversationList() {
   const [conversations, setConversations] = createSignal<UserConversation[]>(

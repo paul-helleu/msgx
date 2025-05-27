@@ -1,5 +1,7 @@
 export interface Message {
+  id: number;
   sender: string;
-  receiver: string;
   content: string;
+  createdAt: Date;
+  updatedAt?: Date;
 }
