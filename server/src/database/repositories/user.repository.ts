@@ -8,7 +8,7 @@ export default {
       },
     });
   },
-  async findByUserId(id: number) {
+  async findById(id: number) {
     return User.findOne({
       where: {
         id,

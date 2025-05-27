@@ -1,18 +1,17 @@
-import { Conversation } from "../models";
+import { Conversation, UserConversation } from "../models";
 
 export default {
-  async findOrCreateBySenderAndReceiverIds(
-    senderId: number,
-    receiverId: number
-  ) {
-    return Conversation.findOrCreate({
-      where: {},
-    });
-  },
   async findByChannelId(channelId: number) {
     return Conversation.findOne({
       where: {
         channel_id: channelId,
+      },
+    });
+  },
+  async findUserConversationByUserId(userId: number) {
+    return UserConversation.findAll({
+      where: {
+        user_id: userId,
       },
     });
   },

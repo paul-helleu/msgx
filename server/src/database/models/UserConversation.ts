@@ -1,10 +1,19 @@
-import { DataTypes, Model } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+} from "sequelize";
 import sequelize from "../sequelize.ts";
 
-class UserConversation extends Model {
-  public id!: number;
-  public user_id!: number;
-  public conversation_id!: number;
+class UserConversation extends Model<
+  InferAttributes<UserConversation>,
+  InferCreationAttributes<UserConversation>
+> {
+  declare id: CreationOptional<number>;
+  declare user_id: number;
+  declare conversation_id: number;
 }
 
 UserConversation.init(

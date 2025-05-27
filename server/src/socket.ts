@@ -33,21 +33,5 @@ io.on("connection", async (socket) => {
       // error
       return;
     }
-    // const receiver = await messageRepository.
-
-    const [conversation, created] =
-      await conversationRepository.findOrCreateConversationBySenderAndReceiverIds(
-        receiver.id,
-        sender.id
-      );
-
-    Message.create({
-      sender_id: sender.id,
-      conv_id: conversation.id,
-      date: new Date(Date.now()),
-      content: msg.content,
-    })
-      .then((res) => socket.emit(getSocketCode(msg.receiver), msg))
-      .catch((err) => socket.emit(getSocketCode(msg.sender), err));
   });
 });
