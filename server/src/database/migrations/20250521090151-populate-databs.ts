@@ -14,35 +14,88 @@ export default {
       {
         id: 2,
         username: 'Bob',
-        password: 'bob123',
+        password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alice
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 3,
+        username: 'Eve',
+        password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alice
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ]);
 
-    // 2. Insert conversation
+    // 2. Insert conversations
     await queryInterface.bulkInsert('conversations', [
       {
         id: 1,
         channel_id: 'alice_bob_channel',
+        name: 'Alice,Bob',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 2,
+        channel_id: 'bob_eve_channel',
+        name: 'Bob,Eve',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 3,
+        channel_id: 'alice_eve_channel',
+        name: 'Alice,Eve',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     ]);
 
-    // 3. Link users to the conversation (via user_conversations)
+    // 3. Link users to conversations
     await queryInterface.bulkInsert('user_conversations', [
+      // Alice ↔ Bob
       {
         id: 1,
-        user_id: 1, // Alice
+        user_id: 1,
         conversation_id: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
         id: 2,
-        user_id: 2, // Bob
+        user_id: 2,
         conversation_id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      // Bob ↔ Eve
+      {
+        id: 3,
+        user_id: 2,
+        conversation_id: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 4,
+        user_id: 3,
+        conversation_id: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      // Alice ↔ Eve
+      {
+        id: 5,
+        user_id: 1,
+        conversation_id: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 6,
+        user_id: 3,
+        conversation_id: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -50,6 +103,7 @@ export default {
 
     // 4. Insert messages
     await queryInterface.bulkInsert('messages', [
+      // Alice ↔ Bob
       {
         id: 1,
         conversation_id: 1,
@@ -74,6 +128,40 @@ export default {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      // Bob ↔ Eve
+      {
+        id: 4,
+        conversation_id: 2,
+        sender_id: 2, // Bob
+        content: 'Salut Eve !',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 5,
+        conversation_id: 2,
+        sender_id: 3, // Eve
+        content: 'Coucou Bob, quoi de neuf ?',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      // Alice ↔ Eve
+      {
+        id: 6,
+        conversation_id: 3,
+        sender_id: 1, // Alice
+        content: 'Hey Eve !',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 7,
+        conversation_id: 3,
+        sender_id: 3, // Eve
+        content: 'Salut Alice !',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
   },
 
@@ -81,6 +169,6 @@ export default {
     await queryInterface.bulkDelete('messages', {}, {});
     await queryInterface.bulkDelete('user_conversations', {}, {});
     await queryInterface.bulkDelete('conversations', {}, {});
-    await queryInterface.bulkDelete('users', { id: [1, 2] });
+    await queryInterface.bulkDelete('users', { id: [1, 2, 3] });
   },
 };

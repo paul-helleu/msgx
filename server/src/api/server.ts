@@ -98,24 +98,18 @@ app.get(
   async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.id;
-      const userConv = await UserConversation.findAll({
+      const userConvIds = await UserConversation.findAll({
         where: { user_id: userId },
-        attributes: ["conversation_id"],
+        attributes: ['conversation_id'],
+        raw: true,
       });
-      const conversations = await UserConversation.findAll({
+
+      const conversations = await Conversation.findAll({
         where: {
-          conversation_id: {
-            [Op.in]: userConv.map((c) => c.get("conversation_id")),
-          },
-          user_id: {
-            [Op.ne]: userId,
+          id: {
+            [Op.in]: userConvIds.map((uc) => uc.conversation_id),
           },
         },
-        include: [
-          { model: User, attributes: ["id", "username"] },
-          { model: Conversation, attributes: ["id", "channel_id"] },
-        ],
-        attributes: ["conversation_id"],
       });
       res.json(conversations);
     } catch (error) {
@@ -126,16 +120,23 @@ app.get(
 );
 
 app.get(
-  "/api/auth/messages/:conv_id",
+  "/api/auth/messages/:channel_id",
   isValidToken,
   async (req: AuthenticatedRequest, res) => {
     try {
-      const convId = req.params.conv_id;
+      const channelId = req.params.channel_id;
       const messages = await Message.findAll({
-        where: { conversation_id: convId },
         include: [
-          { model: User, attributes: ["id", "username"], as: "Sender" },
-          { model: Conversation, attributes: ["id", "channel_id"] },
+          {
+            model: Conversation,
+            attributes: ["id", "channel_id"],
+            where: { channel_id: channelId },
+          },
+          {
+            model: User,
+            as: "Sender",
+            attributes: ["id", "username"],
+          },
         ],
         attributes: ["createdAt", "content"],
         order: [["createdAt", "ASC"]],

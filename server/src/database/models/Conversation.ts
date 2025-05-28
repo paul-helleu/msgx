@@ -13,6 +13,7 @@ class Conversation extends Model<
 > {
   declare id: CreationOptional<number>;
   declare channel_id: string;
+  declare name: string;
   declare createdAt?: CreationOptional<Date>;
 }
 
@@ -24,6 +25,10 @@ Conversation.init(
       autoIncrement: true,
     },
     channel_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },

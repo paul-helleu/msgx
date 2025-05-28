@@ -1,37 +1,29 @@
 import toast, { Toaster } from 'solid-toast';
 import ConversationList from '../components/ConversationList';
 import type { Message } from '../interfaces/Message';
+import type { ChatStore } from '../interfaces/Chat';
 import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
 import { createEffect, createSignal, onCleanup, onMount } from 'solid-js';
-import Conversation from './Conversation';
+import Conversation from '../components/Conversation';
+import { useAuth } from '../components/AuthContext';
 
 export default function Chat() {
   const currentChannelId = 2;
   const senderId = 1;
+  const { user } = useAuth();
 
-  const [storeMessage, setStoreMessage] = createStore({
-    messages: [
-      {
-        id: 1,
-        sender: 'Alice',
-        content: 'Salut !',
-        createdAt: new Date(Date.now() - 5000),
-      } as Message,
-      {
-        id: 2,
-        sender: 'Moi',
-        content: 'Hey ! Ça va ?',
-        createdAt: new Date(Date.now() - 1000),
-      } as Message,
-    ],
+  const [storeChat, setStoreChat] = createStore<ChatStore>({
+    messages: [],
+    conversations: [],
+    currentChannelId: '',
   });
 
   const serverUri = 'http://127.0.0.1:3300';
   const socket = io(serverUri);
 
   const sendMsg = (message: Message) => {
-    socket.emit('sendMessage', {
+    socket.emit('message', {
       channelId: currentChannelId,
       message,
       senderId,
@@ -44,9 +36,9 @@ export default function Chat() {
       socket.emit('joinChannel', channelId);
     });
 
-    socket.on('newMessage', ({ message, channelId, senderId }) => {
+    socket.on('message', ({ message, channelId, senderId }) => {
       if (currentChannelId === channelId) {
-        setStoreMessage('messages', (messages) => [...messages, message]);
+        setStoreChat('messages', (messages) => [...messages, message]);
       } else {
         // Toast with a countdown timer
         const duration = 3000;
@@ -115,11 +107,22 @@ export default function Chat() {
 
   return (
     <div class="flex flex-col md:flex-row h-screen">
-      <ConversationList />
+      <ConversationList
+        conversations={storeChat.conversations}
+        setStoreChat={setStoreChat}
+        currentChannelId={storeChat.currentChannelId}
+        user={user()}
+      />
 
       <main class="flex-1 flex flex-col justify-between bg-white p-4">
         <Toaster />
-        <Conversation messages={storeMessage.messages} sendMessage={sendMsg} />
+        <Conversation
+          messages={storeChat.messages}
+          sendMessage={sendMsg}
+          setStoreChat={setStoreChat}
+          currentChannelId={storeChat.currentChannelId}
+          user={user()}
+        />
       </main>
     </div>
   );

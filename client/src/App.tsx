@@ -4,7 +4,6 @@ import { AuthProvider } from './components/AuthContext';
 import Register from './pages/Register';
 import AuthLoader from './components/AuthLoader';
 import Chat from './pages/Chat';
-import Conversation from './pages/Conversation';
 
 export default function App() {
   return (

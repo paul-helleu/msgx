@@ -6,7 +6,7 @@ import {
   type Setter,
 } from 'solid-js';
 import type { JSX } from 'solid-js/jsx-runtime';
-import type { User } from '../interfaces/types';
+import type { User } from '../interfaces/User';
 
 export interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
