@@ -6,6 +6,7 @@ const io = new Server(port, {
 });
 
 io.on("connection", (socket) => {
+  console.log(socket)
   socket.on("joinChannel", (channelId) => {
     socket.join(channelId);
   });

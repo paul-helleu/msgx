@@ -36,7 +36,7 @@ export default function Chat() {
       socket.emit('joinChannel', channelId);
     });
 
-    socket.on('message', ({ message, channelId, senderId }) => {
+    socket.on('message', ({ message, channelId }) => {
       if (currentChannelId === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
       } else {

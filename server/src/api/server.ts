@@ -87,7 +87,7 @@ app.get(
 app.get(
   "/api/auth/valid_token",
   isValidToken,
-  async (req: AuthenticatedRequest, res) => {
+  async (_: AuthenticatedRequest, res) => {
     res.status(200).json({ message: "Token Valid" });
   }
 );

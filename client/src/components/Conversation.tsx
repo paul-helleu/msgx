@@ -1,4 +1,4 @@
-import { createEffect, For, onMount, type Setter } from 'solid-js';
+import { createEffect, For } from 'solid-js';
 import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import type { SetStoreFunction } from 'solid-js/store';
