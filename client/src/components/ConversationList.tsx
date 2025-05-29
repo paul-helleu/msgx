@@ -1,17 +1,17 @@
-import { For, onMount } from 'solid-js';
-import type { Conversation } from '../interfaces/Conversation';
+import { For, onMount, Show } from 'solid-js';
+import type { ConversationResponse } from '../interfaces/Conversation';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { ChatStore } from '../interfaces/Chat';
 import type { User } from '../interfaces/User';
 
 export default function ConversationList(props: {
-  conversations: Conversation[];
+  conversations: ConversationResponse[];
   setStoreChat: SetStoreFunction<ChatStore>;
   currentChannelId: string;
   user: User | null;
 }) {
   const currentChannelId = () => props.currentChannelId as string;
-  const conversations = () => props.conversations as Conversation[];
+  const conversations = () => props.conversations as ConversationResponse[];
 
   onMount(async () => {
     fetch(`http://localhost:3000/api/auth/conversations`, {
@@ -21,7 +21,10 @@ export default function ConversationList(props: {
     })
       .then((res) => {
         res.json().then((json) => {
-          props.setStoreChat('conversations', () => json as Conversation[]);
+          props.setStoreChat(
+            'conversations',
+            () => json as ConversationResponse[]
+          );
           if (json[0]) {
             props.setStoreChat(
               'currentChannelId',
@@ -36,12 +39,13 @@ export default function ConversationList(props: {
   });
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
+    console.log(conversations());
     props.setStoreChat('currentChannelId', () => channelId as string);
   }
 
   return (
     <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
-      <h2 class="text-xl font-bold mb-4">Contacts</h2>
+      <h2 class="text-xl font-bold mb-4">Conversations</h2>
       <ul class="space-y-2">
         <For each={conversations()}>
           {(conversation) => (
@@ -54,7 +58,25 @@ export default function ConversationList(props: {
               on:click={handleRswitchChannel}
               data-channel-id={conversation.channel_id}
             >
-              <span>{conversation.name}</span>
+              <div class="flex items-center mr-3">
+                <div
+                  class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-400 text-white font-bold select-none"
+                  aria-label="Profil initial"
+                >
+                  {conversation.name.charAt(0).toUpperCase()}
+                </div>
+              </div>
+              <div class="flex flex-col flex-grow">
+                <span class="font-medium truncate">{conversation.name}</span>
+                <Show when={conversation.is_group}>
+                  <span class="text-xs text-gray-600 mt-0.3">
+                    {conversation.members_count + ' Membre(s)'}
+                  </span>
+                </Show>
+              </div>
+              <Show when={!conversation.is_group}>
+                <span class="h-3 w-3 rounded-full bg-green-500 ml-3"></span>
+              </Show>
             </li>
           )}
         </For>

@@ -4,8 +4,9 @@ import {
   type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
-} from "sequelize";
-import sequelize from "../sequelize.ts";
+} from 'sequelize';
+import sequelize from '../sequelize.ts';
+import type { User } from './index.ts';
 
 class Conversation extends Model<
   InferAttributes<Conversation>,
@@ -14,7 +15,9 @@ class Conversation extends Model<
   declare id: CreationOptional<number>;
   declare channel_id: string;
   declare name: string;
+  declare is_group: boolean;
   declare createdAt?: CreationOptional<Date>;
+  declare Users?: User[];
 }
 
 Conversation.init(
@@ -32,10 +35,15 @@ Conversation.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    is_group: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
-    tableName: "conversations",
+    tableName: 'conversations',
   }
 );
 

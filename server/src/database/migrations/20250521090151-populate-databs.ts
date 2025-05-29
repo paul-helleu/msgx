@@ -50,6 +50,14 @@ export default {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: 4,
+        channel_id: 'groupe_avec_tout_le_monde',
+        name: 'Groupe',
+        is_group: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ]);
 
     // 3. Link users to conversations
@@ -96,6 +104,28 @@ export default {
         id: 6,
         user_id: 3,
         conversation_id: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      // Groupe Creation
+      {
+        id: 7,
+        user_id: 1,
+        conversation_id: 4,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 8,
+        user_id: 2,
+        conversation_id: 4,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 9,
+        user_id: 3,
+        conversation_id: 4,
         createdAt: new Date(),
         updatedAt: new Date(),
       },

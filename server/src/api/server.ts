@@ -1,74 +1,74 @@
-import express from "express";
-import router from "../database/routes/index.ts";
-import sequelize from "../database/sequelize.ts";
-import jwt from "jsonwebtoken";
-import cors from "cors";
-import { compareSync, hashSync } from "bcrypt-ts";
-import { isValidToken, type AuthenticatedRequest } from "./auth.ts";
-import { Op } from "sequelize";
+import express from 'express';
+import router from '../database/routes/index.ts';
+import sequelize from '../database/sequelize.ts';
+import jwt from 'jsonwebtoken';
+import cors from 'cors';
+import { compareSync, hashSync } from 'bcrypt-ts';
+import { isValidToken, type AuthenticatedRequest } from './auth.ts';
+import { Op } from 'sequelize';
 import {
   UserConversation,
   Conversation,
   User,
   Message,
-} from "../database/models/index.ts";
+} from '../database/models/index.ts';
 
-const JWT_SECRET = process.env.JWT_SECRET || "MY_SECRET";
+const JWT_SECRET = process.env.JWT_SECRET || 'MY_SECRET';
 
 const app = express();
 app.use(express.json());
-app.use("/api", router);
+app.use('/api', router);
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: 'http://localhost:5173',
     credentials: true,
   })
 );
 
-app.post("/api/login", async (req, res) => {
+app.post('/api/login', async (req, res) => {
   try {
     const { username, password }: { username: string; password: string } =
       req.body;
     const existingUser = await User.findOne({ where: { username } });
     if (!existingUser) {
-      res.status(404).json({ message: "This username does not exist." });
+      res.status(404).json({ message: 'This username does not exist.' });
     } else {
       const isValid = compareSync(password, existingUser.dataValues.password);
       if (!isValid) {
-        res.status(403).json({ message: "Incorrect password" });
+        res.status(403).json({ message: 'Incorrect password' });
       }
       const token = jwt.sign({ id: existingUser.dataValues.id }, JWT_SECRET, {
-        expiresIn: "3h",
+        expiresIn: '3h',
       });
       res
         .status(200)
-        .json({ message: "Authentification Succedeed", token: token });
+        .json({ message: 'Authentification Succedeed', token: token });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: 'Server error', error });
   }
 });
 
-app.post("/api/register", async (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password }: { username: string; password: string } =
     req.body;
 
   const existingUser = await User.findOne({ where: { username } });
   if (existingUser !== null) {
-    res.status(409).json({ message: "Registration error" });
+    res.status(409).json({ message: 'Registration error' });
   }
 
   try {
     await User.create({ username, password: hashSync(password, 10) });
-    res.status(201).json({ message: "success" });
+    res.status(201).json({ message: 'success' });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: 'Server error', error });
   }
 });
 
 // Endpoint starting with /api/auth need "authorization: token" in req headers
 app.get(
-  "/api/auth/user",
+  '/api/auth/user',
   isValidToken,
   async (req: AuthenticatedRequest, res) => {
     try {
@@ -79,48 +79,84 @@ app.get(
         res.json({ id, username });
       }
     } catch (error) {
-      res.status(500).json({ message: "Server Error", error });
+      res.status(500).json({ message: 'Server Error', error });
     }
   }
 );
 
 app.get(
-  "/api/auth/valid_token",
+  '/api/auth/valid_token',
   isValidToken,
   async (_: AuthenticatedRequest, res) => {
-    res.status(200).json({ message: "Token Valid" });
+    res.status(200).json({ message: 'Token Valid' });
   }
 );
 
 app.get(
-  "/api/auth/conversations",
+  '/api/auth/conversations',
   isValidToken,
   async (req: AuthenticatedRequest, res) => {
     try {
       const userId = req.user.id;
-      const userConvIds = await UserConversation.findAll({
+
+      // Récupère les conversations de l'utilisateur
+      const userConversations = await UserConversation.findAll({
         where: { user_id: userId },
         attributes: ['conversation_id'],
         raw: true,
       });
 
+      const conversationIds = userConversations.map((uc) => uc.conversation_id);
+
       const conversations = await Conversation.findAll({
-        where: {
-          id: {
-            [Op.in]: userConvIds.map((uc) => uc.conversation_id),
+        where: { id: { [Op.in]: conversationIds } },
+        include: [
+          {
+            model: User,
+            through: { attributes: [] }, // Exclut UserConversation
+            attributes: ['id', 'username'],
           },
-        },
+        ],
       });
-      res.json(conversations);
+      const result = conversations.map((conversation) => {
+        const users = conversation.Users || [];
+        const isGroup = conversation.is_group;
+
+        if (!isGroup) {
+          const otherUser = users.find((user) => user.id !== userId);
+          return {
+            id: conversation.id,
+            is_group: false,
+            channel_id: conversation.channel_id,
+            name: otherUser?.username,
+            User: otherUser
+              ? {
+                  id: otherUser.id,
+                  username: otherUser.username,
+                }
+              : null,
+          };
+        } else {
+          return {
+            id: conversation.id,
+            is_group: true,
+            name: conversation.name,
+            channel_id: conversation.channel_id,
+            members_count: users.length,
+          };
+        }
+      });
+
+      res.json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 );
 
 app.get(
-  "/api/auth/messages/:channel_id",
+  '/api/auth/messages/:channel_id',
   isValidToken,
   async (req: AuthenticatedRequest, res) => {
     try {
@@ -129,29 +165,29 @@ app.get(
         include: [
           {
             model: Conversation,
-            attributes: ["id", "channel_id"],
+            attributes: ['id', 'channel_id'],
             where: { channel_id: channelId },
           },
           {
             model: User,
-            as: "Sender",
-            attributes: ["id", "username"],
+            as: 'Sender',
+            attributes: ['id', 'username'],
           },
         ],
-        attributes: ["createdAt", "content"],
-        order: [["createdAt", "ASC"]],
+        attributes: ['createdAt', 'content'],
+        order: [['createdAt', 'ASC']],
       });
       res.json(messages);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 );
 
 // Sync Sequelize
 sequelize.sync().then(() => {
-  console.log("Base de données synchronisée");
+  console.log('Base de données synchronisée');
 });
 
 const PORT = process.env.PORT || 3000;
