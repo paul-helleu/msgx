@@ -1,17 +1,16 @@
-import { Toaster } from 'solid-toast';
+import toast, { Toaster } from 'solid-toast';
 import ConversationList from '../components/ConversationList';
 import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
-import { onMount } from 'solid-js';
+import { createEffect, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
-import { showMessageToast } from '../components/MessageToast';
+import { showNotifMessageToast } from '../components/MessageToast';
 
 export default function Chat() {
-  const currentChannelId = 2;
-  const senderId = 1;
+  const socket = io('http://127.0.0.1:3300');
   const { user } = useAuth();
 
   const [storeChat, setStoreChat] = createStore<ChatStore>({
@@ -20,28 +19,43 @@ export default function Chat() {
     currentChannelId: '',
   });
 
-  const serverUri = 'http://127.0.0.1:3300';
-  const socket = io(serverUri);
-
   const sendMsg = (message: Message) => {
+    console.log(storeChat.conversations);
     socket.emit('message', {
-      channelId: currentChannelId,
+      channelId: storeChat.currentChannelId,
       message,
-      senderId,
+      senderId: user()?.id, // senderId = token in the cookie
     });
+
+    if (!storeChat.currentChannelId) {
+      return;
+    }
+
+    fetch(`http://localhost:3000/api/messages/${storeChat.currentChannelId}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ content: message.content })
+    })
+    .catch((err: Error) => {
+      toast.error("Une erreur est survenu: " + err.message);
+    })
   };
 
+
   onMount(() => {
-    const conversationChannelIds = [1, 2];
-    conversationChannelIds.forEach((channelId: number) => {
+    const conversationChannelIds = ["alice_bob_channel", "bob_eve_channel"]; // TODO: foreach conversation ids
+    conversationChannelIds.forEach((channelId: string) => {
       socket.emit('joinChannel', channelId);
     });
 
     socket.on('message', ({ message, channelId }) => {
-      if (currentChannelId === channelId) {
+      if (storeChat.currentChannelId === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
       } else {
-        showMessageToast(message);
+        showNotifMessageToast(message);
       }
     });
   });

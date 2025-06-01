@@ -1,13 +1,13 @@
-import { createEffect, For } from 'solid-js';
+import { createEffect, createSignal, For } from 'solid-js';
 import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { User } from '../interfaces/User';
 
-function fetchMessage(
+const fetchMessage = (
   currentChannelId: string,
   setStoreChat: SetStoreFunction<ChatStore>
-) {
+) => {
   fetch(`http://localhost:3000/api/auth/messages/${currentChannelId}`, {
     headers: {
       authorization: `${localStorage.getItem('token')}`,
@@ -32,6 +32,32 @@ export default function Conversation(props: {
   const currentChannelId = () => props.currentChannelId as string;
   const sendMessage = (msg: Message) => props.sendMessage(msg);
 
+  const [messageContent, setMessageContent] = createSignal('');
+
+  const handleSendMessage = () => {
+    const content = messageContent().trim();
+    
+    if (!content || !props.user) return;
+
+    const msg = {
+      id: Date.now(),
+      content: content,
+      Sender: props.user,
+      createdAt: new Date(Date.now()),
+    } as Message;
+
+    sendMessage(msg);
+    
+    setMessageContent('');
+  };
+
+  const handleKeyPress = (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   createEffect(() => {
     if (currentChannelId()) {
       fetchMessage(currentChannelId(), props.setStoreChat);
@@ -39,7 +65,7 @@ export default function Conversation(props: {
   });
 
   return (
-    <main class="flex-1 flex flex-col justify-between bg-white p-4">
+    <>
       <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
         <For each={messages()}>
           {(msg) => (
@@ -72,24 +98,18 @@ export default function Conversation(props: {
         <input
           type="text"
           placeholder="Écrivez un message..."
+          value={messageContent()}
+          onInput={(e) => setMessageContent(e.currentTarget.value)}
+          onKeyPress={handleKeyPress}
           class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:border-indigo-300"
         />
         <button
-          onClick={() => {
-            const msg = {
-              id: 3,
-              content: 'Hello',
-              Sender: props.user,
-              createdAt: new Date(Date.now()),
-            } as Message;
-
-            sendMessage(msg);
-          }}
+          onClick={handleSendMessage}
           class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
         >
           Envoyer
         </button>
       </div>
-    </main>
+    </>
   );
 }
