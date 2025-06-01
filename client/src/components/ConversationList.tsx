@@ -3,6 +3,7 @@ import type { ConversationResponse } from '../interfaces/Conversation';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { ChatStore } from '../interfaces/Chat';
 import type { User } from '../interfaces/User';
+import ProfilePicture from './ProfilePicture';
 
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
@@ -59,17 +60,21 @@ export default function ConversationList(props: {
               data-channel-id={conversation.channel_id}
             >
               <div class="flex items-center mr-3">
-                <div
-                  class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-400 text-white font-bold select-none"
-                  aria-label="Profil initial"
-                >
-                  {conversation.name.charAt(0).toUpperCase()}
-                </div>
+                <ProfilePicture
+                  username={conversation.name.charAt(0).toUpperCase()}
+                  is_group={conversation.is_group}
+                ></ProfilePicture>
               </div>
               <div class="flex flex-col flex-grow">
                 <span class="font-medium truncate">{conversation.name}</span>
                 <Show when={conversation.is_group}>
-                  <span class="text-xs text-gray-600 mt-0.3">
+                  <span
+                    class={`text-xs text-gray-600 mt-0.3 ${
+                      conversation.channel_id === currentChannelId()
+                        ? 'text-white'
+                        : ''
+                    }`}
+                  >
                     {conversation.members_count + ' Membre(s)'}
                   </span>
                 </Show>

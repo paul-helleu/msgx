@@ -3,6 +3,7 @@ import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { User } from '../interfaces/User';
+import MessageComponent from './MessageComponent';
 
 function fetchMessage(
   currentChannelId: string,
@@ -43,27 +44,10 @@ export default function Conversation(props: {
       <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
         <For each={messages()}>
           {(msg) => (
-            <div
-              class={`max-w-xs px-4 py-2 rounded-lg shadow text-sm ${
-                msg.Sender.id === props.user?.id
-                  ? 'bg-indigo-500 text-white self-end ml-auto'
-                  : 'bg-gray-200 text-gray-900 self-start mr-auto'
-              }`}
-            >
-              <p>{msg.content}</p>
-              <span class="text-xs opacity-60 block mt-1">
-                {new Date(msg.createdAt).toLocaleString('fr-FR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })}
-                {' - '}
-                {new Date(msg.createdAt).toLocaleString('fr-FR', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </span>
-            </div>
+            <MessageComponent
+              sendByMe={msg.Sender.id === props.user?.id}
+              msg={msg}
+            ></MessageComponent>
           )}
         </For>
       </div>
