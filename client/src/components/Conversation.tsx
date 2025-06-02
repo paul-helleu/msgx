@@ -40,7 +40,7 @@ export default function Conversation(props: {
   });
 
   return (
-    <main class="flex-1 flex flex-col justify-between bg-white p-4">
+    <div class="flex-1 flex flex-col justify-between bg-white p-4">
       <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
         <For each={messages()}>
           {(msg) => (
@@ -74,6 +74,6 @@ export default function Conversation(props: {
           Envoyer
         </button>
       </div>
-    </main>
+    </div>
   );
 }

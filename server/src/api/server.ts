@@ -129,12 +129,14 @@ app.get(
             is_group: false,
             channel_id: conversation.channel_id,
             name: otherUser?.username,
-            User: otherUser
-              ? {
-                  id: otherUser.id,
-                  username: otherUser.username,
-                }
-              : null,
+            Users: otherUser
+              ? [
+                  {
+                    id: otherUser.id,
+                    username: otherUser.username,
+                  },
+                ]
+              : [],
           };
         } else {
           return {
@@ -143,6 +145,7 @@ app.get(
             name: conversation.name,
             channel_id: conversation.channel_id,
             members_count: users.length,
+            Users: users.filter((user) => user.id !== userId),
           };
         }
       });

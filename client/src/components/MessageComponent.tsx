@@ -6,33 +6,6 @@ export default function MessageComponent(props: {
   msg: Message;
 }) {
   return (
-    // <div
-    //   class={`flex items-start gap-2 mb-4 ${
-    //     props.sendByMe ? 'justify-end flex-row-reverse' : 'justify-start'
-    //   }`}
-    // >
-    //   <span class="text-xs opacity-60 block mt-1">
-    //     {new Date(props.msg.createdAt).toLocaleString('fr-FR', {
-    //       day: '2-digit',
-    //       month: '2-digit',
-    //       year: 'numeric',
-    //     })}
-    //     {' - '}
-    //     {new Date(props.msg.createdAt).toLocaleString('fr-FR', {
-    //       hour: '2-digit',
-    //       minute: '2-digit',
-    //     })}
-    //   </span>
-    //   <div
-    //     class={`max-w-2/3 px-4 py-2 rounded-lg shadow text-sm ${
-    //       props.sendByMe
-    //         ? 'bg-indigo-500 text-white self-end ml-auto'
-    //         : 'bg-gray-200 text-gray-900 self-start mr-auto'
-    //     }`}
-    //   >
-    //     <p>{props.msg.content}</p>
-    //   </div>
-    // </div>
     <div
       class={`flex gap-2 mb-4 items-end ${
         props.sendByMe ? 'justify-end flex-row-reverse' : 'justify-start'
@@ -62,12 +35,11 @@ export default function MessageComponent(props: {
             minute: '2-digit',
           })}
         </div>
-
         <div
           class={`px-4 py-2 rounded-lg shadow text-sm break-words max-w-4/5 ${
             props.sendByMe
-              ? 'bg-indigo-500 text-white'
-              : 'bg-gray-200 text-gray-900'
+              ? 'bg-indigo-500 text-white rounded-tr-none'
+              : 'bg-gray-200 text-gray-900 rounded-tl-none'
           }`}
         >
           <p>{props.msg.content}</p>

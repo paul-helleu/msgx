@@ -40,7 +40,6 @@ export default function ConversationList(props: {
   });
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
-    console.log(conversations());
     props.setStoreChat('currentChannelId', () => channelId as string);
   }
 

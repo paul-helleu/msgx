@@ -8,6 +8,7 @@ import { onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showMessageToast } from '../components/MessageToast';
+import ConversationHeader from '../components/ConversationHeader';
 
 export default function Chat() {
   const currentChannelId = 2;
@@ -54,8 +55,11 @@ export default function Chat() {
         currentChannelId={storeChat.currentChannelId}
         user={user()}
       />
-
-      <main class="flex-1 flex flex-col justify-between bg-white p-4">
+      <main class="flex-1 flex flex-col justify-between">
+        <ConversationHeader
+          currentChannelId={storeChat.currentChannelId}
+          conversations={storeChat.conversations}
+        />
         <Toaster />
         <Conversation
           messages={storeChat.messages}

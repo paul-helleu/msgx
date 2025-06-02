@@ -1,4 +1,3 @@
-import './Register.css';
 import { useAuth } from '../components/AuthContext';
 import { useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';

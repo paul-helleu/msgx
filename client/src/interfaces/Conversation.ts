@@ -12,6 +12,6 @@ export interface ConversationResponse {
   channel_id: string;
   is_group: boolean | false;
   name: string;
-  User: User;
-  members_count: 3;
+  Users: User[];
+  members_count: number | 2;
 }
