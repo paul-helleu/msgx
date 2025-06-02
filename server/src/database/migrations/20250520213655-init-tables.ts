@@ -221,10 +221,7 @@ export default {
     });
   },
 
-  async down(
-    queryInterface: { dropTable: (arg0: string) => any },
-    Sequelize: any
-  ) {
+  async down(queryInterface: { dropTable: (arg0: string) => any }) {
     await queryInterface.dropTable('user_conversations');
     await queryInterface.dropTable('messages');
     await queryInterface.dropTable('conversations');
