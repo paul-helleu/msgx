@@ -4,6 +4,8 @@ import type { ChatStore } from '../interfaces/Chat';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { User } from '../interfaces/User';
 import MessageComponent from './MessageComponent';
+import { FiSend } from 'solid-icons/fi';
+import type { ConversationResponse } from '../interfaces/Conversation';
 
 function fetchMessage(
   currentChannelId: string,
@@ -26,12 +28,12 @@ export default function Conversation(props: {
   messages: Message[];
   sendMessage: Function;
   setStoreChat: SetStoreFunction<ChatStore>;
-  currentChannelId: string;
+  currentConversation?: ConversationResponse;
   user: User | null;
 }) {
   const messages = () => props.messages as Message[];
-  const currentChannelId = () => props.currentChannelId as string;
   const sendMessage = (msg: Message) => props.sendMessage(msg);
+  const currentChannelId = () => props.currentConversation?.channel_id ?? '';
 
   createEffect(() => {
     if (currentChannelId()) {
@@ -52,11 +54,11 @@ export default function Conversation(props: {
         </For>
       </div>
 
-      <div class="flex items-center gap-2 border-t pt-3">
+      <div class="flex items-center border rounded-full px-4 py-2 shadow-sm bg-white w-full">
         <input
           type="text"
-          placeholder="Écrivez un message..."
-          class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:border-indigo-300"
+          placeholder={`Envoyer un message à ${props.currentConversation?.name}`}
+          class="flex-1 border-none focus:outline-none focus:ring-0 text-sm placeholder-gray-400 bg-transparent"
         />
         <button
           onClick={() => {
@@ -69,9 +71,9 @@ export default function Conversation(props: {
 
             sendMessage(msg);
           }}
-          class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+          class="text-gray-500 hover:text-indigo-600 transition text-lg ml-1"
         >
-          Envoyer
+          <FiSend />
         </button>
       </div>
     </div>

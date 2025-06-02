@@ -56,16 +56,13 @@ export default function Chat() {
         user={user()}
       />
       <main class="flex-1 flex flex-col justify-between">
-        <ConversationHeader
-          currentChannelId={storeChat.currentChannelId}
-          conversations={storeChat.conversations}
-        />
+        <ConversationHeader conversation={storeChat.currentConversation} />
         <Toaster />
         <Conversation
           messages={storeChat.messages}
+          currentConversation={storeChat.currentConversation}
           sendMessage={sendMsg}
           setStoreChat={setStoreChat}
-          currentChannelId={storeChat.currentChannelId}
           user={user()}
         />
       </main>

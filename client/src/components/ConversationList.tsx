@@ -1,4 +1,4 @@
-import { For, onMount, Show } from 'solid-js';
+import { createEffect, For, onMount, Show } from 'solid-js';
 import type { ConversationResponse } from '../interfaces/Conversation';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { ChatStore } from '../interfaces/Chat';
@@ -42,6 +42,11 @@ export default function ConversationList(props: {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
     props.setStoreChat('currentChannelId', () => channelId as string);
   }
+  createEffect(() => {
+    const channelId = props.currentChannelId;
+    const conv = props.conversations.find((el) => el.channel_id === channelId);
+    props.setStoreChat('currentConversation', conv ? { ...conv } : undefined);
+  });
 
   return (
     <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">

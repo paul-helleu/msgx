@@ -3,23 +3,19 @@ import ProfilePicture from './ProfilePicture';
 import { createSignal } from 'solid-js';
 
 export default function ConversationHeader(props: {
-  currentChannelId: string;
-  conversations: ConversationResponse[];
+  conversation?: ConversationResponse;
 }) {
-  const conversations = () => props.conversations;
   const [showModal, setShowModal] = createSignal(false);
-  const conv = () =>
-    conversations().find((el) => el.channel_id === props.currentChannelId);
 
   return (
     <div class="flex items-center justify-between px-4 py-2 text-sm bg-gray-100">
       <div class="flex items-center">
         <ProfilePicture
-          username={conv()?.name ?? ''}
-          is_group={conv()?.is_group}
+          username={props.conversation?.name ?? ''}
+          is_group={props.conversation?.is_group}
         />
         <h2 class="font-medium text-gray-800 truncate ml-2">
-          {conv()?.name ?? ''}
+          {props.conversation?.name ?? ''}
         </h2>
       </div>
       <button
@@ -35,11 +31,13 @@ export default function ConversationHeader(props: {
         >
           <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
             <h3 class="text-lg font-semibold mb-4">
-              {conv()!.members_count > 1 ? 'Membres' : 'Membre'} de la
-              conversation
+              {props.conversation?.members_count ?? 1 > 1
+                ? 'Membres'
+                : 'Membre'}{' '}
+              de la conversation
             </h3>
             <ul class="text-sm space-y-2">
-              {conv()?.Users.map((user) => (
+              {props.conversation?.Users.map((user) => (
                 <li class="flex items-center gap-2">
                   <ProfilePicture username={user.username} />
                   <span>{user.username}</span>

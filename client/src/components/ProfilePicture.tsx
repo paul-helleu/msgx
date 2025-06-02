@@ -1,3 +1,5 @@
+import { FaSolidUserGroup } from 'solid-icons/fa';
+
 export default function ProfilePicture(props: {
   username: string;
   is_group?: boolean | false;
@@ -8,7 +10,7 @@ export default function ProfilePicture(props: {
         class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-400 text-white font-bold select-none"
         aria-label="Profil initial"
       >
-        <img class="invert w-1/2" src="group.png" />
+        <FaSolidUserGroup />
       </div>
     );
   } else {
