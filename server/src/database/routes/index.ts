@@ -5,6 +5,7 @@ import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
 import { UserConversation } from '../models';
 import userRepository from '../repositories/user.repository.ts';
 import sequelize from '../sequelize.ts';
+import { literal, Op } from 'sequelize';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
@@ -147,7 +148,6 @@ router.post(
     }
 
     const recipientUsers = [];
-
     for (const recipientUsername of recipients) {
       const recipient = await userRepository.findByUsername(recipientUsername);
       if (!recipient) {
@@ -158,7 +158,47 @@ router.post(
         return;
       }
 
+      if (recipient.id === senderId) {
+        res.status(400).json({
+          message: 'You cannot create a conversation with yourself',
+          errors: { sender: { code: '', message: '' } },
+        });
+        return;
+      }
+
       recipientUsers.push(recipient);
+    }
+
+    if (recipientUsers.length === 1) {
+      const recipient = recipientUsers[0];
+
+      const conversations = await Conversation.findAll({
+        where: { is_group: false },
+        include: [
+          {
+            association: 'Users',
+            where: {
+              id: [senderId, recipient.id],
+            },
+            required: true,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      });
+
+      const matchingConversation = conversations.find(
+        (conv) => conv.Users && conv.Users.length === 2
+      );
+
+      if (matchingConversation) {
+        res.status(200).json({
+          message: 'Conversation already exists',
+          conversation: matchingConversation,
+        });
+        return;
+      }
     }
 
     const transaction = await sequelize.transaction();
@@ -190,58 +230,5 @@ router.post(
     }
   }
 );
-
-// router.post('/conversations/:channelId/messages', async (req, res, next) => {
-//   // check authentification
-//   const senderId = 1;
-
-//   const channelId = parseInt(req.params.channelId, 10);
-//   if (Number.isNaN(channelId)) {
-//     res.status(400).json({
-//       message: 'Invalid Id must be an integer',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
-
-//   const content: string | null = req.body?.content;
-//   if (content === null || content.length === 0) {
-//     res.status(400).json({
-//       message: 'Message must contains content',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
-
-//   const conversation = await conversationRepository.findByChannelId(channelId);
-//   if (conversation === null) {
-//     res.status(400).json({
-//       message: 'No conversation found, need to create the conversation',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
-
-//   const message = await Message.create({
-//     content,
-//     conversation_id: conversation.id,
-//     sender_id: senderId,
-//   });
-// });
 
 export default router;
