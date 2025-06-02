@@ -4,10 +4,11 @@ import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
-import { createEffect, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showNotifMessageToast } from '../components/MessageToast';
+import type { ConversationResponse } from '../interfaces/Conversation';
 
 export default function Chat() {
   const socket = io('http://127.0.0.1:3300');
@@ -19,8 +20,37 @@ export default function Chat() {
     currentChannelId: '',
   });
 
+  createEffect(() => {
+    for (const conversation of storeChat.conversations) {
+      socket.emit('joinChannel', conversation.channel_id);
+    }
+  }, storeChat.conversations);
+
+  const fetchConversations = () => {
+    fetch(`http://localhost:3000/api/auth/conversations`, {
+      headers: {
+        authorization: `${localStorage.getItem('token')}`,
+      },
+    })
+      .then((res) => {
+        res.json().then((json) => {
+          const conversationResponses = json as ConversationResponse[];
+          setStoreChat('conversations', () => conversationResponses);
+
+          if (conversationResponses.length) {
+            setStoreChat(
+              'currentChannelId',
+              () => conversationResponses[0].channel_id
+            );
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const sendMsg = (message: Message) => {
-    console.log(storeChat.conversations);
     socket.emit('message', {
       channelId: storeChat.currentChannelId,
       message,
@@ -32,25 +62,18 @@ export default function Chat() {
     }
 
     fetch(`http://localhost:3000/api/messages/${storeChat.currentChannelId}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `${localStorage.getItem('token')}`,
+        Authorization: `${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify({ content: message.content })
-    })
-    .catch((err: Error) => {
-      toast.error("Une erreur est survenu: " + err.message);
-    })
+      body: JSON.stringify({ content: message.content }),
+    }).catch((err: Error) => {
+      toast.error('Une erreur est survenu: ' + err.message);
+    });
   };
 
-
   onMount(() => {
-    const conversationChannelIds = ["alice_bob_channel", "bob_eve_channel"]; // TODO: foreach conversation ids
-    conversationChannelIds.forEach((channelId: string) => {
-      socket.emit('joinChannel', channelId);
-    });
-
     socket.on('message', ({ message, channelId }) => {
       if (storeChat.currentChannelId === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
@@ -65,6 +88,7 @@ export default function Chat() {
       <ConversationList
         conversations={storeChat.conversations}
         setStoreChat={setStoreChat}
+        fetchConversations={fetchConversations}
         currentChannelId={storeChat.currentChannelId}
         user={user()}
       />
