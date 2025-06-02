@@ -1,4 +1,4 @@
-import { Conversation, UserConversation } from "../models";
+import { Conversation, UserConversation } from '../models';
 
 export default {
   async findByChannelId(channelId: number) {

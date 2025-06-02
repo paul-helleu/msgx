@@ -3,6 +3,8 @@ import { Server } from 'socket.io';
 const port = Number(process.env.SERVER_SOCKET_PORT) || 3300;
 const io = new Server(port, {
   cors: { origin: process.env.SERVER_CLIENT_URI! },
+  pingTimeout: 10000,
+  pingInterval: 25000,
 });
 
 io.on('connection', (socket) => {
