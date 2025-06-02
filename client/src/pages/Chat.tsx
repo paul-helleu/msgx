@@ -9,8 +9,12 @@ import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showMessageToast } from '../components/MessageToast';
 import ConversationHeader from '../components/ConversationHeader';
+import { useParams } from '@solidjs/router';
 
 export default function Chat() {
+  const params = useParams();
+  const channelId = () => params.channelId;
+
   const currentChannelId = 2;
   const senderId = 1;
   const { user } = useAuth();
@@ -53,6 +57,7 @@ export default function Chat() {
         conversations={storeChat.conversations}
         setStoreChat={setStoreChat}
         currentChannelId={storeChat.currentChannelId}
+        channelId={channelId()}
         user={user()}
       />
       <main class="flex-1 flex flex-col justify-between">

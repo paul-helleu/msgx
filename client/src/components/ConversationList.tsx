@@ -4,15 +4,18 @@ import type { SetStoreFunction } from 'solid-js/store';
 import type { ChatStore } from '../interfaces/Chat';
 import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
+import { useNavigate } from '@solidjs/router';
 
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
   setStoreChat: SetStoreFunction<ChatStore>;
   currentChannelId: string;
   user: User | null;
+  channelId: string;
 }) {
   const currentChannelId = () => props.currentChannelId as string;
   const conversations = () => props.conversations as ConversationResponse[];
+  const navigate = useNavigate();
 
   onMount(async () => {
     fetch(`http://localhost:3000/api/auth/conversations`, {
@@ -26,7 +29,12 @@ export default function ConversationList(props: {
             'conversations',
             () => json as ConversationResponse[]
           );
-          if (json[0]) {
+          const fromUrl = json.find(
+            (c: any) => c.channel_id === props.channelId
+          );
+          if (fromUrl) {
+            props.setStoreChat('currentChannelId', fromUrl.channel_id);
+          } else if (json[0]) {
             props.setStoreChat(
               'currentChannelId',
               () => json[0].channel_id as string
@@ -41,6 +49,7 @@ export default function ConversationList(props: {
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
     props.setStoreChat('currentChannelId', () => channelId as string);
+    navigate(`/conversation/${channelId}`);
   }
   createEffect(() => {
     const channelId = props.currentChannelId;

@@ -20,14 +20,21 @@ export default function App() {
           )}
         />
         <Route
-          path="/conversation"
+          path="/conversation/:channelId"
           component={() => (
             <AuthLoader>
               <Chat />
             </AuthLoader>
           )}
         />
-
+        <Route
+          path="/conversation/"
+          component={() => (
+            <AuthLoader>
+              <Chat />
+            </AuthLoader>
+          )}
+        />
         <Route
           path="/"
           component={() => (
