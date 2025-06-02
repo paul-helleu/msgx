@@ -9,6 +9,7 @@ import { useNavigate } from '@solidjs/router';
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
   setStoreChat: SetStoreFunction<ChatStore>;
+  fetchConversations: Function;
   currentChannelId: string;
   user: User | null;
   channelId: string;
@@ -17,47 +18,14 @@ export default function ConversationList(props: {
   const conversations = () => props.conversations as ConversationResponse[];
   const navigate = useNavigate();
 
-  onMount(async () => {
-    fetch(`http://localhost:3000/api/auth/conversations`, {
-      headers: {
-        authorization: `${localStorage.getItem('token')}`,
-      },
-    })
-      .then((res) => {
-        res.json().then((json) => {
-          props.setStoreChat(
-            'conversations',
-            () => json as ConversationResponse[]
-          );
-          const fromUrl = json.find(
-            (c: any) => c.channel_id === props.channelId
-          );
-          if (fromUrl) {
-            props.setStoreChat('currentChannelId', fromUrl.channel_id);
-          } else if (json[0]) {
-            props.setStoreChat(
-              'currentChannelId',
-              () => json[0].channel_id as string
-            );
-          }
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  onMount(() => {
+    props.fetchConversations();
   });
 
-  async function handleRswitchChannel(e: Event) {
+  const handlerSwitchChannel = (e: Event) => {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
     props.setStoreChat('currentChannelId', () => channelId as string);
-    navigate(`/conversation/${channelId}`);
-  }
-
-  createEffect(() => {
-    const channelId = props.currentChannelId;
-    const conv = props.conversations.find((el) => el.channel_id === channelId);
-    props.setStoreChat('currentConversation', conv ? { ...conv } : undefined);
-  });
+  };
 
   return (
     <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
@@ -71,7 +39,7 @@ export default function ConversationList(props: {
                   ? 'bg-zinc-900 text-white self-end ml-auto hover:bg-zinc-700'
                   : ''
               }`}
-              on:click={handleRswitchChannel}
+              on:click={handlerSwitchChannel}
               data-channel-id={conversation.channel_id}
             >
               <div class="flex items-center mr-3">

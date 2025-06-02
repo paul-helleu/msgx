@@ -4,7 +4,7 @@ import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
-import { createEffect, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showNotifMessageToast } from '../components/MessageToast';
