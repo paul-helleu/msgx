@@ -12,6 +12,7 @@ import {
   User,
   Message,
 } from '../database/models/index.ts';
+import { getRandomTailwindColorClass } from '../utils/colors.ts';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'MY_SECRET';
 
@@ -59,7 +60,11 @@ app.post('/api/register', async (req, res) => {
   }
 
   try {
-    await User.create({ username, password: hashSync(password, 10) });
+    await User.create({
+      username,
+      password: hashSync(password, 10),
+      color: getRandomTailwindColorClass(),
+    });
     res.status(201).json({ message: 'success' });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
@@ -75,8 +80,8 @@ app.get(
       const userId = req.user.id;
       const user = await User.findOne({ where: { id: userId } });
       if (user) {
-        const { id, username } = user.toJSON();
-        res.json({ id, username });
+        const { id, username, color } = user.toJSON();
+        res.json({ id, username, color });
       }
     } catch (error) {
       res.status(500).json({ message: 'Server Error', error });
@@ -114,7 +119,7 @@ app.get(
           {
             model: User,
             through: { attributes: [] }, // Exclut UserConversation
-            attributes: ['id', 'username'],
+            attributes: ['id', 'username', 'color'],
           },
         ],
       });
@@ -129,11 +134,13 @@ app.get(
             is_group: false,
             channel_id: conversation.channel_id,
             name: otherUser?.username,
+            color: otherUser?.color,
             Users: otherUser
               ? [
                   {
                     id: otherUser.id,
                     username: otherUser.username,
+                    color: otherUser.color,
                   },
                 ]
               : [],
@@ -142,6 +149,7 @@ app.get(
           return {
             id: conversation.id,
             is_group: true,
+            color: conversation.color,
             name: conversation.name,
             channel_id: conversation.channel_id,
             members_count: users.length,
@@ -174,7 +182,7 @@ app.get(
           {
             model: User,
             as: 'Sender',
-            attributes: ['id', 'username'],
+            attributes: ['id', 'username', 'color'],
           },
         ],
         attributes: ['createdAt', 'content'],

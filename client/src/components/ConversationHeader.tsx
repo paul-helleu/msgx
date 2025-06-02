@@ -12,7 +12,8 @@ export default function ConversationHeader(props: {
       <div class="flex items-center">
         <ProfilePicture
           username={props.conversation?.name ?? ''}
-          is_group={props.conversation?.is_group}
+          isGroup={props.conversation?.is_group}
+          color={props.conversation?.color}
         />
         <h2 class="font-medium text-gray-800 truncate ml-2">
           {props.conversation?.name ?? ''}
@@ -39,7 +40,10 @@ export default function ConversationHeader(props: {
             <ul class="text-sm space-y-2">
               {props.conversation?.Users.map((user) => (
                 <li class="flex items-center gap-2">
-                  <ProfilePicture username={user.username} />
+                  <ProfilePicture
+                    username={user.username}
+                    color={user?.color}
+                  />
                   <span>{user.username}</span>
                 </li>
               )) ?? <li>Aucun membre</li>}

@@ -7,21 +7,27 @@ export default {
       {
         id: 1,
         username: 'Alice',
-        password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // hash of 1234
+        password:
+          '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // hash of 1234
+        color: 'bg-cyan-500',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
         id: 2,
         username: 'Bob',
-        password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alice
+        password:
+          '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alice
+        color: 'bg-green-500',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
         id: 3,
         username: 'Eve',
-        password: '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alice
+        password:
+          '$2b$10$VbcsmzDCZF4DMbHx705BIOyafO38irp94OLUwDu7b8HiDEccSdfEe', // same as Alic
+        color: 'bg-lime-500',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -193,6 +199,12 @@ export default {
         updatedAt: new Date(),
       },
     ]);
+    await queryInterface.sequelize.query(`
+      SELECT setval(pg_get_serial_sequence('"users"', 'id'), 10, true);
+      SELECT setval(pg_get_serial_sequence('"conversations"', 'id'), 10, true);
+      SELECT setval(pg_get_serial_sequence('"user_conversations"', 'id'), 10, true);
+      SELECT setval(pg_get_serial_sequence('"messages"', 'id'), 10, true);
+    `);
   },
 
   async down(queryInterface: QueryInterface): Promise<void> {

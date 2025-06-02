@@ -6,7 +6,8 @@ export default function ProfileFooter(props: { user: User | null }) {
     <div class="bg-gray-200 p-4 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <ProfilePicture
-          username={props.user?.username?.charAt(0).toUpperCase() ?? 'U'}
+          username={props.user?.username ?? 'U'}
+          color={props.user?.color}
         />
         <div class="text-gray-800 font-semibold truncate">
           {props.user?.username ?? 'Utilisateur'}

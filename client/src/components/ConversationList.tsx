@@ -75,7 +75,8 @@ export default function ConversationList(props: {
               <div class="flex items-center mr-3">
                 <ProfilePicture
                   username={conversation.name.charAt(0).toUpperCase()}
-                  is_group={conversation.is_group}
+                  isGroup={conversation.is_group}
+                  color={conversation?.color}
                 ></ProfilePicture>
               </div>
               <div class="flex flex-col flex-grow">

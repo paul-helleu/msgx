@@ -11,7 +11,10 @@ export default function MessageComponent(props: {
         props.sendByMe ? 'justify-end flex-row-reverse' : 'justify-start'
       }`}
     >
-      <ProfilePicture username={props.msg.Sender.username} />
+      <ProfilePicture
+        username={props.msg.Sender.username}
+        color={props.msg.Sender?.color}
+      />
 
       <div
         class={`flex flex-col w-1/1 ${

@@ -13,5 +13,6 @@ export interface ConversationResponse {
   is_group: boolean | false;
   name: string;
   Users: User[];
+  color: string;
   members_count: number | 2;
 }

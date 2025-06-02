@@ -4,13 +4,14 @@ import {
   type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
-} from "sequelize";
-import sequelize from "../sequelize.ts";
+} from 'sequelize';
+import sequelize from '../sequelize.ts';
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
   declare id: CreationOptional<number>;
   declare username: string;
   declare password: string;
+  declare color: string;
   declare createdAt?: CreationOptional<Date>;
 }
 
@@ -30,10 +31,14 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize,
-    tableName: "users",
+    tableName: 'users',
   }
 );
 
