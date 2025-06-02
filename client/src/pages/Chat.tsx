@@ -4,7 +4,7 @@ import type { Message } from '../interfaces/Message';
 import type { ChatStore } from '../interfaces/Chat';
 import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
-import { createEffect, createSignal, onMount } from 'solid-js';
+import { createEffect, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showNotifMessageToast } from '../components/MessageToast';
@@ -35,7 +35,11 @@ export default function Chat() {
       .then((res) => {
         res.json().then((json) => {
           const conversationResponses = json as ConversationResponse[];
-          setStoreChat('conversations', () => conversationResponses);
+          setStoreChat('conversations', () =>
+            conversationResponses.map((conv) => {
+              return { ...conv, newMessages: 0 };
+            })
+          );
 
           if (conversationResponses.length) {
             setStoreChat(
@@ -54,7 +58,7 @@ export default function Chat() {
     socket.emit('message', {
       channelId: storeChat.currentChannelId,
       message,
-      senderId: user()?.id, // senderId = token in the cookie
+      senderId: user()?.id,
     });
 
     if (!storeChat.currentChannelId) {
@@ -77,9 +81,21 @@ export default function Chat() {
     socket.on('message', ({ message, channelId }) => {
       if (storeChat.currentChannelId === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
-      } else {
-        showNotifMessageToast(message);
+        return;
       }
+
+      showNotifMessageToast({
+        content: message.content,
+        username: message.Sender.username,
+      });
+
+      setStoreChat('conversations', (convs) =>
+        convs.map((conv) =>
+          conv.channel_id === channelId
+            ? { ...conv, newMessages: (conv.newMessages || 0) + 1 }
+            : conv
+        )
+      );
     });
   });
 

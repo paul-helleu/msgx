@@ -19,7 +19,7 @@ const fetchMessage = (
         .then((json) => setStoreChat('messages', () => json as Message[]))
     )
     .catch((err) => console.log(err));
-}
+};
 
 export default function Conversation(props: {
   messages: Message[];
@@ -36,18 +36,16 @@ export default function Conversation(props: {
 
   const handleSendMessage = () => {
     const content = messageContent().trim();
-    
+
     if (!content || !props.user) return;
 
     const msg = {
       id: Date.now(),
       content: content,
       Sender: props.user,
-      createdAt: new Date(Date.now()),
     } as Message;
 
     sendMessage(msg);
-    
     setMessageContent('');
   };
 

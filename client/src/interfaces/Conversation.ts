@@ -14,4 +14,5 @@ export interface ConversationResponse {
   name: string;
   User: User;
   members_count: 3;
+  newMessages: number;
 }

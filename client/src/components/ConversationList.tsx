@@ -11,8 +11,7 @@ export default function ConversationList(props: {
   currentChannelId: string;
   user: User | null;
 }) {
-  const currentChannelId = () => props.currentChannelId as string;
-  const conversations = () => props.conversations as ConversationResponse[];
+  const currentChannelId = () => props.currentChannelId;
 
   onMount(() => {
     props.fetchConversations();
@@ -27,7 +26,7 @@ export default function ConversationList(props: {
     <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
       <h2 class="text-xl font-bold mb-4">Conversations</h2>
       <ul class="space-y-2">
-        <For each={conversations()}>
+        <For each={props.conversations}>
           {(conversation) => (
             <li
               class={`flex items-center justify-between hover:bg-gray-300 p-2 rounded cursor-pointer ${
@@ -46,17 +45,31 @@ export default function ConversationList(props: {
                   {conversation.name.charAt(0).toUpperCase()}
                 </div>
               </div>
+
               <div class="flex flex-col flex-grow">
                 <span class="font-medium truncate">{conversation.name}</span>
                 <Show when={conversation.is_group}>
                   <span class="text-xs text-gray-600 mt-0.3">
-                    {conversation.members_count + ' Membre(s)'}
+                    {conversation.members_count + ' Membres'}
                   </span>
                 </Show>
               </div>
-              <Show when={!conversation.is_group}>
-                <span class="h-3 w-3 rounded-full bg-green-500 ml-3"></span>
-              </Show>
+
+              <div class="flex items-center gap-2">
+                <Show when={!conversation.is_group}>
+                  <span class="h-3 w-3 rounded-full bg-green-500"></span>
+                </Show>
+
+                <Show
+                  when={
+                    conversation.newMessages && conversation.newMessages > 0
+                  }
+                >
+                  <span class="bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                    {conversation.newMessages}
+                  </span>
+                </Show>
+              </div>
             </li>
           )}
         </For>
