@@ -5,7 +5,6 @@ import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
 import { UserConversation } from '../models';
 import userRepository from '../repositories/user.repository.ts';
 import sequelize from '../sequelize.ts';
-import { literal, Op } from 'sequelize';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
@@ -95,7 +94,7 @@ router.post(
   isValidToken,
   async (req: AuthenticatedRequest, res, next) => {
     const senderId = req.user.id;
-    const { recipients } = req.body;
+    const { recipients, name } = req.body;
 
     if (!recipients || !Array.isArray(recipients)) {
       res.status(400).json({
@@ -201,13 +200,16 @@ router.post(
       }
     }
 
+    const groupName = name ? name.toString() : 'New Conversation';
+    const isGroup = recipientUsers.length > 1;
+
     const transaction = await sequelize.transaction();
     try {
       const newConversation = await Conversation.create(
         {
           channel_id: crypto.randomUUID(),
-          name: recipients.length > 1 ? 'New Group' : '',
-          is_group: recipients.length > 1,
+          name: isGroup ? groupName : '',
+          is_group: isGroup,
         },
         { transaction }
       );
