@@ -10,6 +10,7 @@ import { useAuth } from '../components/AuthContext';
 import { showMessageToast } from '../components/MessageToast';
 import ConversationHeader from '../components/ConversationHeader';
 import { useParams } from '@solidjs/router';
+import ProfileFooter from '../components/ProfileFooter';
 
 export default function Chat() {
   const params = useParams();
@@ -53,13 +54,16 @@ export default function Chat() {
 
   return (
     <div class="flex flex-col md:flex-row h-screen">
-      <ConversationList
-        conversations={storeChat.conversations}
-        setStoreChat={setStoreChat}
-        currentChannelId={storeChat.currentChannelId}
-        channelId={channelId()}
-        user={user()}
-      />
+      <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 flex flex-col h-full">
+        <ConversationList
+          conversations={storeChat.conversations}
+          setStoreChat={setStoreChat}
+          currentChannelId={storeChat.currentChannelId}
+          channelId={channelId()}
+          user={user()}
+        />
+        <ProfileFooter user={user()} />
+      </aside>
       <main class="flex-1 flex flex-col justify-between">
         <ConversationHeader conversation={storeChat.currentConversation} />
         <Toaster />

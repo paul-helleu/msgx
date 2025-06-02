@@ -58,7 +58,7 @@ export default function ConversationList(props: {
   });
 
   return (
-    <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 p-4 overflow-y-auto">
+    <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
       <h2 class="text-xl font-bold mb-4">Conversations</h2>
       <ul class="space-y-2">
         <For each={conversations()}>
@@ -99,6 +99,6 @@ export default function ConversationList(props: {
           )}
         </For>
       </ul>
-    </aside>
+    </div>
   );
 }

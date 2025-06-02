@@ -73,7 +73,7 @@ export default function Conversation(props: {
           }}
           class="text-gray-500 hover:text-indigo-600 transition text-lg ml-1"
         >
-          <FiSend />
+          <FiSend class="text-2xl" />
         </button>
       </div>
     </div>
