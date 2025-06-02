@@ -72,7 +72,6 @@ export default function Conversation(props: {
       id: Date.now(),
       content: content,
       Sender: props.user,
-      createdAt: new Date(Date.now()),
     } as Message;
 
     sendMessage(msg);

@@ -31,7 +31,7 @@ export default function ConversationList(props: {
     <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
       <h2 class="text-xl font-bold mb-4">Conversations</h2>
       <ul class="space-y-2">
-        <For each={conversations()}>
+        <For each={props.conversations}>
           {(conversation) => (
             <li
               class={`flex items-center justify-between hover:bg-gray-300 p-2 rounded cursor-pointer ${
@@ -49,6 +49,7 @@ export default function ConversationList(props: {
                   color={conversation?.color}
                 ></ProfilePicture>
               </div>
+
               <div class="flex flex-col flex-grow">
                 <span class="font-medium truncate">{conversation.name}</span>
                 <Show when={conversation.is_group}>
