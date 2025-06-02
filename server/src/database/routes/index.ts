@@ -5,6 +5,7 @@ import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
 import { UserConversation } from '../models';
 import userRepository from '../repositories/user.repository.ts';
 import sequelize from '../sequelize.ts';
+import { literal, Op } from 'sequelize';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
