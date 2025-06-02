@@ -41,7 +41,7 @@ export default function MessageComponent(props: {
         <div
           class={`px-4 py-2 rounded-lg shadow text-sm break-words max-w-4/5 ${
             props.sendByMe
-              ? 'bg-indigo-500 text-white rounded-tr-none'
+              ? 'bg-zinc-900 text-white rounded-tr-none'
               : 'bg-gray-200 text-gray-900 rounded-tl-none'
           }`}
         >

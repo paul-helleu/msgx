@@ -66,7 +66,7 @@ export default function ConversationList(props: {
             <li
               class={`flex items-center justify-between hover:bg-gray-300 p-2 rounded cursor-pointer ${
                 conversation.channel_id === currentChannelId()
-                  ? 'bg-indigo-500 text-white self-end ml-auto hover:bg-indigo-700'
+                  ? 'bg-zinc-900 text-white self-end ml-auto hover:bg-zinc-700'
                   : ''
               }`}
               on:click={handleRswitchChannel}
