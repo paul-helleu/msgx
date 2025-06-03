@@ -8,8 +8,13 @@ import { createEffect, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
 import { useAuth } from '../components/AuthContext';
 import { showNotifMessageToast } from '../components/MessageToast';
+import ConversationHeader from '../components/ConversationHeader';
+import ProfileFooter from '../components/ProfileFooter';
+import { useParams } from '@solidjs/router';
 
 export default function Chat() {
+  const params = useParams();
+  const channelId = () => params.channelId;
   const socket = io('http://127.0.0.1:3300');
   const { user } = useAuth();
 
@@ -19,12 +24,17 @@ export default function Chat() {
     currentChannelId: '',
   });
 
+  createEffect(() => {
+    for (const conversation of storeChat.conversations) {
+      socket.emit('joinChannel', conversation.channel_id);
+    }
+  }, storeChat.conversations);
+
   const sendMsg = (message: Message) => {
-    console.log(storeChat.conversations);
     socket.emit('message', {
       channelId: storeChat.currentChannelId,
       message,
-      senderId: user()?.id, // senderId = token in the cookie
+      senderId: user()?.id,
     });
 
     if (!storeChat.currentChannelId) {
@@ -32,34 +42,38 @@ export default function Chat() {
     }
 
     fetch(`http://localhost:3000/api/messages/${storeChat.currentChannelId}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `${localStorage.getItem('token')}`,
+        Authorization: `${localStorage.getItem('token')}`,
       },
-      body: JSON.stringify({ content: message.content })
-    })
-    .catch((err: Error) => {
-      toast.error("Une erreur est survenu: " + err.message);
-    })
+      body: JSON.stringify({ content: message.content }),
+    }).catch((err: Error) => {
+      toast.error('Une erreur est survenu: ' + err.message);
+    });
   };
 
-
   onMount(() => {
-    const conversationChannelIds = ["alice_bob_channel", "bob_eve_channel"]; // TODO: foreach conversation ids
-    conversationChannelIds.forEach((channelId: string) => {
-      socket.emit('joinChannel', channelId);
-    });
-
     socket.on('message', ({ message, channelId }) => {
       if (storeChat.currentChannelId === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
-      } else {
-        showNotifMessageToast(message);
+        return;
       }
+
+      showNotifMessageToast({
+        content: message.content,
+        username: message.Sender.username,
+      });
+
+      setStoreChat('conversations', (convs) =>
+        convs.map((conv) =>
+          conv.channel_id === channelId
+            ? { ...conv, newMessages: (conv.newMessages || 0) + 1 }
+            : conv
+        )
+      );
     });
   });
-
   return (
     <div class="flex flex-col md:flex-row h-screen">
       <div class="bg-red-500 bg-orange-500 bg-amber-500 bg-yellow-500 bg-lime-500 bg-green-500 bg-emerald-500 bg-teal-500 bg-cyan-500 bg-sky-500 bg-blue-500 bg-violet-500 bg-purple-500 bg-fuchsia-500 bg-pink-500 bg-rose-500"></div>

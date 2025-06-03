@@ -22,7 +22,7 @@ const fetchMessage = (
         .then((json) => setStoreChat('messages', () => json as Message[]))
     )
     .catch((err) => console.log(err));
-}
+};
 
 export default function Conversation(props: {
   messages: Message[];
@@ -39,7 +39,6 @@ export default function Conversation(props: {
 
   const handleSendMessage = () => {
     const content = messageContent().trim();
-    
     if (!content || !props.user) return;
 
     const msg = {
@@ -50,7 +49,6 @@ export default function Conversation(props: {
     } as Message;
 
     sendMessage(msg);
-    
     setMessageContent('');
   };
 
@@ -83,15 +81,15 @@ export default function Conversation(props: {
       <div class="flex items-center border rounded-full px-4 py-2 shadow-sm bg-white w-full">
         <input
           type="text"
-          placeholder="Écrivez un message..."
+          placeholder={`Envoyer un message à ${props.currentConversation?.name}`}
           value={messageContent()}
           onInput={(e) => setMessageContent(e.currentTarget.value)}
           onKeyPress={handleKeyPress}
-          class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:border-indigo-300"
+          class="flex-1 border-none focus:outline-none focus:ring-0 text-sm placeholder-gray-400 bg-transparent"
         />
         <button
           onClick={handleSendMessage}
-          class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+          class="text-gray-500 hover:text-indigo-600 transition text-lg ml-1"
         >
           <FiSend class="text-2xl" />
         </button>

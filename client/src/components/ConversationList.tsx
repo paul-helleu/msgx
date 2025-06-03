@@ -46,11 +46,13 @@ export default function ConversationList(props: {
         console.log(err);
       });
   });
+
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
     props.setStoreChat('currentChannelId', () => channelId as string);
     navigate(`/conversation/${channelId}`);
   }
+
   createEffect(() => {
     const channelId = props.currentChannelId;
     const conv = props.conversations.find((el) => el.channel_id === channelId);
@@ -93,9 +95,21 @@ export default function ConversationList(props: {
                   </span>
                 </Show>
               </div>
-              <Show when={!conversation.is_group}>
-                <span class="h-3 w-3 rounded-full bg-green-500 ml-3"></span>
-              </Show>
+              <div class="flex items-center gap-2">
+                <Show when={!conversation.is_group}>
+                  <span class="h-3 w-3 rounded-full bg-green-500"></span>
+                </Show>
+
+                <Show
+                  when={
+                    conversation.newMessages && conversation.newMessages > 0
+                  }
+                >
+                  <span class="bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                    {conversation.newMessages}
+                  </span>
+                </Show>
+              </div>
             </li>
           )}
         </For>
