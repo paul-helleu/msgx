@@ -1,4 +1,5 @@
 import type { ConversationResponse } from '../interfaces/Conversation';
+import ModalComponent from './ModalComponent';
 import ProfilePicture from './ProfilePicture';
 import { createSignal } from 'solid-js';
 
@@ -25,18 +26,14 @@ export default function ConversationHeader(props: {
       >
         Voir les membres
       </button>
-      {showModal() && (
-        <div
-          onClick={() => setShowModal(false)}
-          class="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-50"
-        >
-          <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
-            <h3 class="text-lg font-semibold mb-4">
-              {props.conversation?.members_count ?? 1 > 1
-                ? 'Membres'
-                : 'Membre'}{' '}
-              de la conversation
-            </h3>
+      <ModalComponent
+        isOpen={showModal()}
+        setIsOpen={setShowModal}
+        title={`${
+          props.conversation?.members_count ?? 2 > 2 ? 'Membres' : 'Membre'
+        } de la conversation`}
+        children={
+          <>
             <ul class="text-sm space-y-2">
               {props.conversation?.Users.map((user) => (
                 <li class="flex items-center gap-2">
@@ -48,15 +45,9 @@ export default function ConversationHeader(props: {
                 </li>
               )) ?? <li>Aucun membre</li>}
             </ul>
-            <button
-              onClick={() => setShowModal(false)}
-              class="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-sm"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+          </>
+        }
+      ></ModalComponent>
     </div>
   );
 }
