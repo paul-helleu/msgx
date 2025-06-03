@@ -1,22 +1,20 @@
 import { createEffect, For, onMount, Show } from 'solid-js';
 import type { ConversationResponse } from '../interfaces/Conversation';
-import type { SetStoreFunction } from 'solid-js/store';
-import type { ChatStore } from '../interfaces/Chat';
 import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
 import { useNavigate } from '@solidjs/router';
+import { useApp } from './AppContext';
 
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
-  setStoreChat: SetStoreFunction<ChatStore>;
   currentChannelId: string;
   user: User | null;
   channelId: string;
-  userStatus: { [username: string]: 'online' | 'offline' };
 }) {
   const currentChannelId = () => props.currentChannelId as string;
   const conversations = () => props.conversations as ConversationResponse[];
   const navigate = useNavigate();
+  const { setStoreChat, userStatus } = useApp();
 
   onMount(async () => {
     fetch(`http://localhost:3000/api/auth/conversations`, {
@@ -26,21 +24,16 @@ export default function ConversationList(props: {
     })
       .then((res) => {
         res.json().then((json) => {
-          props.setStoreChat(
-            'conversations',
-            () => json as ConversationResponse[]
-          );
+          setStoreChat('conversations', () => json as ConversationResponse[]);
           const fromUrl = json.find(
             (c: any) => c.channel_id === props.channelId
           );
-          if (fromUrl) {
-            props.setStoreChat('currentChannelId', fromUrl.channel_id);
-          } else if (json[0]) {
-            props.setStoreChat(
+          if (fromUrl) setStoreChat('currentChannelId', fromUrl.channel_id);
+          else if (json[0])
+            setStoreChat(
               'currentChannelId',
               () => json[0].channel_id as string
             );
-          }
         });
       })
       .catch((err) => {
@@ -50,8 +43,8 @@ export default function ConversationList(props: {
 
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
-    props.setStoreChat('currentChannelId', () => channelId as string);
-    props.setStoreChat('conversations', (convs) => {
+    setStoreChat('currentChannelId', () => channelId as string);
+    setStoreChat('conversations', (convs) => {
       return convs.map((conv) => ({ ...conv, newMessagesCount: 0 }));
     });
     navigate(`/conversation/${channelId}`);
@@ -60,7 +53,7 @@ export default function ConversationList(props: {
   createEffect(() => {
     const channelId = props.currentChannelId;
     const conv = props.conversations.find((el) => el.channel_id === channelId);
-    props.setStoreChat('currentConversation', conv ? { ...conv } : undefined);
+    setStoreChat('currentConversation', conv ? { ...conv } : undefined);
   });
 
   return (
@@ -103,12 +96,12 @@ export default function ConversationList(props: {
                 <Show when={!conversation.is_group}>
                   <span
                     class={`h-3 w-3 rounded-full ${
-                      props.userStatus[conversation.name] === 'online'
+                      userStatus[conversation.name] === 'online'
                         ? 'bg-green-500'
                         : 'bg-gray-400'
                     }`}
                     title={
-                      props.userStatus[conversation.name] === 'online'
+                      userStatus[conversation.name] === 'online'
                         ? 'En ligne'
                         : 'Hors ligne'
                     }

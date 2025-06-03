@@ -6,6 +6,7 @@ import type { User } from '../interfaces/User';
 import MessageComponent from './MessageComponent';
 import { FiSend } from 'solid-icons/fi';
 import type { ConversationResponse } from '../interfaces/Conversation';
+import { useApp } from './AppContext';
 
 function prepareMessages(
   messages: Message[]
@@ -54,10 +55,11 @@ const fetchMessage = (
 export default function Conversation(props: {
   messages: Message[];
   sendMessage: Function;
-  setStoreChat: SetStoreFunction<ChatStore>;
   currentConversation?: ConversationResponse;
   user: User | null;
 }) {
+  const { setStoreChat } = useApp();
+
   const messages = () => props.messages as Message[];
   const sendMessage = (msg: Message) => props.sendMessage(msg);
   const currentChannelId = () => props.currentConversation?.channel_id ?? '';
@@ -88,7 +90,7 @@ export default function Conversation(props: {
 
   createEffect(() => {
     if (currentChannelId()) {
-      fetchMessage(currentChannelId(), props.setStoreChat);
+      fetchMessage(currentChannelId(), setStoreChat);
     }
   });
 

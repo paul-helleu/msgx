@@ -1,8 +1,6 @@
 import toast, { Toaster } from 'solid-toast';
 import ConversationList from '../components/ConversationList';
 import type { Message } from '../interfaces/Message';
-import type { ChatStore } from '../interfaces/Chat';
-import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
 import { createEffect, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
@@ -11,6 +9,7 @@ import { showNotifMessageToast } from '../components/MessageToast';
 import ConversationHeader from '../components/ConversationHeader';
 import ProfileFooter from '../components/ProfileFooter';
 import { useParams } from '@solidjs/router';
+import { useApp } from '../components/AppContext';
 
 export default function Chat() {
   const params = useParams();
@@ -18,15 +17,7 @@ export default function Chat() {
   const socket = io('http://127.0.0.1:3300');
   const { user } = useAuth();
 
-  const [userStatus, setUserStatus] = createStore<{
-    [username: string]: 'online' | 'offline';
-  }>({});
-
-  const [storeChat, setStoreChat] = createStore<ChatStore>({
-    messages: [],
-    conversations: [],
-    currentChannelId: '',
-  });
+  const { storeChat, setStoreChat, setUserStatus } = useApp();
 
   createEffect(() => {
     for (const conversation of storeChat.conversations) {
@@ -56,8 +47,6 @@ export default function Chat() {
       toast.error('Une erreur est survenu: ' + err.message);
     });
   };
-
-  const createNewConversation = () => {};
 
   onMount(() => {
     socket.on('message', ({ message, channelId }) => {
@@ -109,11 +98,9 @@ export default function Chat() {
       <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 flex flex-col h-full">
         <ConversationList
           conversations={storeChat.conversations}
-          setStoreChat={setStoreChat}
           currentChannelId={storeChat.currentChannelId}
           channelId={channelId()}
           user={user()}
-          userStatus={userStatus}
         />
         <ProfileFooter user={user()} />
       </aside>
@@ -124,7 +111,6 @@ export default function Chat() {
           messages={storeChat.messages}
           currentConversation={storeChat.currentConversation}
           sendMessage={sendMsg}
-          setStoreChat={setStoreChat}
           user={user()}
         />
       </main>
