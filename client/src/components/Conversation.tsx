@@ -7,6 +7,33 @@ import MessageComponent from './MessageComponent';
 import { FiSend } from 'solid-icons/fi';
 import type { ConversationResponse } from '../interfaces/Conversation';
 
+function prepareMessages(
+  messages: Message[]
+): (Message & { showMeta: boolean })[] {
+  const result: (Message & { showMeta: boolean })[] = [];
+
+  for (let i = 0; i < messages.length; i++) {
+    const current = messages[i];
+    const previous = messages[i - 1];
+
+    const isSameSender = previous?.Sender.id === current.Sender.id;
+    const isSameMinute =
+      previous &&
+      Math.abs(
+        new Date(current.createdAt).getTime() -
+          new Date(previous.createdAt).getTime()
+      ) <
+        60 * 1000;
+
+    result.push({
+      ...current,
+      showMeta: !(isSameSender && isSameMinute),
+    });
+  }
+
+  return result;
+}
+
 const fetchMessage = (
   currentChannelId: string,
   setStoreChat: SetStoreFunction<ChatStore>
@@ -68,12 +95,13 @@ export default function Conversation(props: {
   return (
     <div class="flex-1 flex flex-col justify-between bg-white p-4">
       <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
-        <For each={messages()}>
+        <For each={prepareMessages(messages())}>
           {(msg) => (
             <MessageComponent
               sendByMe={msg.Sender.id === props.user?.id}
               msg={msg}
-            ></MessageComponent>
+              showMeta={msg.showMeta}
+            />
           )}
         </For>
       </div>
