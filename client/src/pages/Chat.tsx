@@ -18,6 +18,10 @@ export default function Chat() {
   const socket = io('http://127.0.0.1:3300');
   const { user } = useAuth();
 
+  const [userStatus, setUserStatus] = createStore<{
+    [username: string]: 'online' | 'offline';
+  }>({});
+
   const [storeChat, setStoreChat] = createStore<ChatStore>({
     messages: [],
     conversations: [],
@@ -53,6 +57,8 @@ export default function Chat() {
     });
   };
 
+  const createNewConversation = () => {};
+
   onMount(() => {
     socket.on('message', ({ message, channelId }) => {
       if (storeChat.currentChannelId === channelId) {
@@ -73,6 +79,29 @@ export default function Chat() {
         )
       );
     });
+
+    const username = user()?.username;
+    if (!username) return;
+
+    socket.emit('announce-presence', username);
+
+    socket.emit('who-is-online');
+
+    socket.on('who-is-online-request', (requesterSocketId: string) => {
+      socket.emit('i-am-online', { toSocketId: requesterSocketId, username });
+    });
+
+    socket.on('user-connected', (username: string) => {
+      setUserStatus(username, 'online');
+    });
+
+    socket.on('user-disconnected', (username: string) => {
+      setUserStatus(username, 'offline');
+    });
+
+    socket.on('i-am-online', (username: string) => {
+      setUserStatus(username, 'online');
+    });
   });
   return (
     <div class="flex flex-col md:flex-row h-screen">
@@ -84,6 +113,7 @@ export default function Chat() {
           currentChannelId={storeChat.currentChannelId}
           channelId={channelId()}
           user={user()}
+          userStatus={userStatus}
         />
         <ProfileFooter user={user()} />
       </aside>

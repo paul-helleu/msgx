@@ -12,6 +12,7 @@ export default function ConversationList(props: {
   currentChannelId: string;
   user: User | null;
   channelId: string;
+  userStatus: { [username: string]: 'online' | 'offline' };
 }) {
   const currentChannelId = () => props.currentChannelId as string;
   const conversations = () => props.conversations as ConversationResponse[];
@@ -100,7 +101,18 @@ export default function ConversationList(props: {
               </div>
               <div class="flex items-center gap-2">
                 <Show when={!conversation.is_group}>
-                  <span class="h-3 w-3 rounded-full bg-green-500"></span>
+                  <span
+                    class={`h-3 w-3 rounded-full ${
+                      props.userStatus[conversation.name] === 'online'
+                        ? 'bg-green-500'
+                        : 'bg-gray-400'
+                    }`}
+                    title={
+                      props.userStatus[conversation.name] === 'online'
+                        ? 'En ligne'
+                        : 'Hors ligne'
+                    }
+                  ></span>
                 </Show>
 
                 <Show
