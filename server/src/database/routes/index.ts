@@ -1,98 +1,90 @@
 import { Router } from 'express';
 import Message from '../models/Message.ts';
 import Conversation from '../models/Conversation.ts';
+import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
 
 const router = Router();
 
-router.post('/messages/:channelId', async (req, res, next) => {
-  try {
-    const { channelId } = req.params;
-    const { content, senderId } = req.body;
-    // sender_id = req.user.id
+router.post(
+  '/messages/:channelId',
+  isValidToken,
+  async (req: AuthenticatedRequest, res, next) => {
+    try {
+      const { channelId } = req.params;
+      const { content } = req.body;
+      const senderId = req.user.id;
 
-    if (!channelId || channelId.trim().length === 0) {
-      res.status(400).json({
-        message: 'Validation failed',
-        errors: {
-          channel_id: {
-            code: 'REQUIRED_FIELD',
-            message: 'Channel ID is required',
+      if (!channelId || channelId.trim().length === 0) {
+        res.status(400).json({
+          message: 'Validation failed',
+          errors: {
+            channel_id: {
+              code: 'REQUIRED_FIELD',
+              message: 'Channel ID is required',
+            },
           },
+        });
+        return;
+      }
+
+      if (!content || content.trim().length === 0) {
+        res.status(400).json({
+          message: 'Validation failed',
+          errors: {
+            content: {
+              code: 'REQUIRED_FIELD',
+              message: 'Message content is required and cannot be empty',
+            },
+          },
+        });
+        return;
+      }
+
+      const conversation = await Conversation.findOne({
+        where: {
+          channel_id: channelId.trim(),
         },
       });
-      return;
-    }
 
-    if (!content || content.trim().length === 0) {
-      res.status(400).json({
-        message: 'Validation failed',
-        errors: {
-          content: {
-            code: 'REQUIRED_FIELD',
-            message: 'Message content is required and cannot be empty',
+      if (!conversation) {
+        res.status(404).json({
+          message: 'Channel not found',
+          errors: {
+            channelId: {
+              code: 'NOT_FOUND',
+              message: 'No conversation found for this channel ID',
+            },
           },
+        });
+        return;
+      }
+
+      const message = await Message.create({
+        conversation_id: conversation.id,
+        sender_id: parseInt(senderId, 10),
+        content: content.trim(),
+      });
+
+      res.status(201).json({
+        message: 'Message sent successfully',
+        data: {
+          id: message.id,
+          conversationId: message.conversation_id,
+          channelId: conversation.channel_id,
+          senderId: message.sender_id,
+          content: message.content,
+          createdAt: message.createdAt,
+          updatedAt: message.updatedAt,
         },
       });
-      return;
+    } catch (err) {
+      res.status(500).json({ status: 'Internal server error' });
     }
-
-    if (!senderId || Number.isNaN(parseInt(senderId, 10))) {
-      res.status(400).json({
-        message: 'Validation failed',
-        errors: {
-          sender_id: {
-            code: 'INVALID_FORMAT',
-            message: 'Sender ID must be a valid number',
-          },
-        },
-      });
-      return;
-    }
-
-    const conversation = await Conversation.findOne({
-      where: {
-        channel_id: channelId.trim(),
-      },
-    });
-
-    if (!conversation) {
-      res.status(404).json({
-        message: 'Channel not found',
-        errors: {
-          channelId: {
-            code: 'NOT_FOUND',
-            message: 'No conversation found for this channel ID',
-          },
-        },
-      });
-      return;
-    }
-
-    const message = await Message.create({
-      conversation_id: conversation.id,
-      sender_id: parseInt(senderId, 10),
-      content: content.trim(),
-    });
-
-    res.status(201).json({
-      message: 'Message sent successfully',
-      data: {
-        id: message.id,
-        conversationId: message.conversation_id,
-        channelId: conversation.channel_id,
-        senderId: message.sender_id,
-        content: message.content,
-        createdAt: message.createdAt,
-        updatedAt: message.updatedAt,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ status: 'Internal server error', err });
   }
-});
+);
 
 // router.get('/users', UserController.getAll);
 // router.get('/conversations', ConversationController.getAll);

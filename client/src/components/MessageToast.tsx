@@ -1,7 +1,7 @@
 import { createSignal, createEffect, onCleanup } from 'solid-js';
 import toast, { type Toast } from 'solid-toast';
 
-export function showMessageToast(message: any) {
+export function showNotifMessageToast(message: any) {
   const duration = 3000;
   toast.custom(
     (t) => {
