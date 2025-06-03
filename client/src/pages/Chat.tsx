@@ -68,7 +68,7 @@ export default function Chat() {
       setStoreChat('conversations', (convs) =>
         convs.map((conv) =>
           conv.channel_id === channelId
-            ? { ...conv, newMessages: (conv.newMessages || 0) + 1 }
+            ? { ...conv, newMessagesCount: (conv.newMessagesCount || 0) + 1 }
             : conv
         )
       );

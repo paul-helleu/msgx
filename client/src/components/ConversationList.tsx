@@ -50,6 +50,9 @@ export default function ConversationList(props: {
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
     props.setStoreChat('currentChannelId', () => channelId as string);
+    props.setStoreChat('conversations', (convs) => {
+      return convs.map((conv) => ({ ...conv, newMessagesCount: 0 }));
+    });
     navigate(`/conversation/${channelId}`);
   }
 
@@ -102,11 +105,12 @@ export default function ConversationList(props: {
 
                 <Show
                   when={
-                    conversation.newMessages && conversation.newMessages > 0
+                    conversation.newMessagesCount &&
+                    conversation.newMessagesCount > 0
                   }
                 >
                   <span class="bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-                    {conversation.newMessages}
+                    {conversation.newMessagesCount}
                   </span>
                 </Show>
               </div>

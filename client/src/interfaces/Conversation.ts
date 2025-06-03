@@ -15,5 +15,5 @@ export interface ConversationResponse {
   Users: User[];
   color: string;
   members_count: number | 2;
-  newMessages: number;
+  newMessagesCount: number;
 }
