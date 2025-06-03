@@ -27,30 +27,33 @@ export default function Chat() {
 
   const sendMsg = (message: Message) => {
     socket.emit('message', {
-      channelId: storeChat.currentChannelId,
+      channelId: storeChat.currentConversation?.channel_id,
       message,
       senderId: user()?.id,
     });
 
-    if (!storeChat.currentChannelId) {
+    if (!storeChat.currentConversation?.channel_id) {
       return;
     }
 
-    fetch(`http://localhost:3000/api/messages/${storeChat.currentChannelId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({ content: message.content }),
-    }).catch((err: Error) => {
+    fetch(
+      `http://localhost:3000/api/messages/${storeChat.currentConversation?.channel_id}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ content: message.content }),
+      }
+    ).catch((err: Error) => {
       toast.error('Une erreur est survenu: ' + err.message);
     });
   };
 
   onMount(() => {
     socket.on('message', ({ message, channelId }) => {
-      if (storeChat.currentChannelId === channelId) {
+      if (storeChat.currentConversation?.channel_id === channelId) {
         setStoreChat('messages', (messages) => [...messages, message]);
         return;
       }
@@ -98,7 +101,6 @@ export default function Chat() {
       <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 flex flex-col h-full">
         <ConversationList
           conversations={storeChat.conversations}
-          currentChannelId={storeChat.currentChannelId}
           channelId={channelId()}
           user={user()}
         />

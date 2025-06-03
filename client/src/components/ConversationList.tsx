@@ -1,4 +1,4 @@
-import { createEffect, For, onMount, Show } from 'solid-js';
+import { For, onMount, Show } from 'solid-js';
 import type { ConversationResponse } from '../interfaces/Conversation';
 import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
@@ -7,14 +7,12 @@ import { useApp } from './AppContext';
 
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
-  currentChannelId: string;
   user: User | null;
   channelId: string;
 }) {
-  const currentChannelId = () => props.currentChannelId as string;
   const conversations = () => props.conversations as ConversationResponse[];
   const navigate = useNavigate();
-  const { setStoreChat, userStatus } = useApp();
+  const { storeChat, setStoreChat, userStatus, switchConversation } = useApp();
 
   onMount(async () => {
     fetch(`http://localhost:3000/api/auth/conversations`, {
@@ -28,12 +26,8 @@ export default function ConversationList(props: {
           const fromUrl = json.find(
             (c: any) => c.channel_id === props.channelId
           );
-          if (fromUrl) setStoreChat('currentChannelId', fromUrl.channel_id);
-          else if (json[0])
-            setStoreChat(
-              'currentChannelId',
-              () => json[0].channel_id as string
-            );
+          if (fromUrl) switchConversation(fromUrl.channel_id);
+          else if (json[0]) switchConversation(json[0].channel_id);
         });
       })
       .catch((err) => {
@@ -43,18 +37,12 @@ export default function ConversationList(props: {
 
   async function handleRswitchChannel(e: Event) {
     const channelId = (e.currentTarget as HTMLElement).dataset.channelId;
-    setStoreChat('currentChannelId', () => channelId as string);
+    switchConversation(channelId as string);
     setStoreChat('conversations', (convs) => {
       return convs.map((conv) => ({ ...conv, newMessagesCount: 0 }));
     });
     navigate(`/conversation/${channelId}`);
   }
-
-  createEffect(() => {
-    const channelId = props.currentChannelId;
-    const conv = props.conversations.find((el) => el.channel_id === channelId);
-    setStoreChat('currentConversation', conv ? { ...conv } : undefined);
-  });
 
   return (
     <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
@@ -64,7 +52,8 @@ export default function ConversationList(props: {
           {(conversation) => (
             <li
               class={`flex items-center justify-between hover:bg-gray-300 p-2 rounded cursor-pointer ${
-                conversation.channel_id === currentChannelId()
+                conversation.channel_id ===
+                storeChat.currentConversation?.channel_id
                   ? 'bg-zinc-900 text-white self-end ml-auto hover:bg-zinc-700'
                   : ''
               }`}
@@ -83,7 +72,8 @@ export default function ConversationList(props: {
                 <Show when={conversation.is_group}>
                   <span
                     class={`text-xs text-gray-600 mt-0.3 ${
-                      conversation.channel_id === currentChannelId()
+                      conversation.channel_id ===
+                      storeChat.currentConversation?.channel_id
                         ? 'text-white'
                         : ''
                     }`}

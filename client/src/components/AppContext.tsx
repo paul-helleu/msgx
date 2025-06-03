@@ -12,6 +12,7 @@ export interface AppContextType {
   setUserStatus: SetStoreFunction<{
     [username: string]: 'online' | 'offline';
   }>;
+  switchConversation: (channelId: string) => void;
 }
 
 const AppContext = createContext<AppContextType>();
@@ -20,17 +21,24 @@ export function AppProvider(props: { children: JSX.Element }) {
   const [storeChat, setStoreChat] = createStore<ChatStore>({
     messages: [],
     conversations: [],
-    currentChannelId: '',
   });
   const [userStatus, setUserStatus] = createStore<{
     [username: string]: 'online' | 'offline';
   }>({});
+
+  const switchConversation = (channelId: string) => {
+    const conv = storeChat.conversations.find(
+      (el) => el.channel_id === channelId
+    );
+    setStoreChat('currentConversation', conv ? { ...conv } : undefined);
+  };
 
   const context: AppContextType = {
     storeChat,
     setStoreChat,
     userStatus,
     setUserStatus,
+    switchConversation,
   };
 
   return (
