@@ -66,6 +66,7 @@ export default function Conversation(props: {
 
   const handleSendMessage = () => {
     const content = messageContent().trim();
+
     if (!content || !props.user) return;
 
     const msg = {

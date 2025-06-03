@@ -1,4 +1,4 @@
-import { createEffect, For, onMount, Show } from 'solid-js';
+import { For, onMount, Show } from 'solid-js';
 import type { ConversationResponse } from '../interfaces/Conversation';
 import type { SetStoreFunction } from 'solid-js/store';
 import type { ChatStore } from '../interfaces/Chat';
@@ -9,7 +9,6 @@ import { useNavigate } from '@solidjs/router';
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
   setStoreChat: SetStoreFunction<ChatStore>;
-  fetchConversations: Function;
   currentChannelId: string;
   user: User | null;
   channelId: string;
@@ -19,7 +18,31 @@ export default function ConversationList(props: {
   const navigate = useNavigate();
 
   onMount(() => {
-    props.fetchConversations();
+    fetch(`http://localhost:3000/api/auth/conversations`, {
+      headers: {
+        authorization: `${localStorage.getItem('token')}`,
+      },
+    })
+      .then((res) => {
+        res.json().then((json) => {
+          const conversationResponses = json as ConversationResponse[];
+          props.setStoreChat('conversations', () =>
+            conversationResponses.map((conv) => {
+              return { ...conv, newMessages: 0 };
+            })
+          );
+
+          if (conversationResponses.length) {
+            props.setStoreChat(
+              'currentChannelId',
+              () => conversationResponses[0].channel_id
+            );
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 
   const handlerSwitchChannel = (e: Event) => {
@@ -31,7 +54,7 @@ export default function ConversationList(props: {
     <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
       <h2 class="text-xl font-bold mb-4">Conversations</h2>
       <ul class="space-y-2">
-        <For each={props.conversations}>
+        <For each={conversations()}>
           {(conversation) => (
             <li
               class={`flex items-center justify-between hover:bg-gray-300 p-2 rounded cursor-pointer ${
@@ -49,7 +72,6 @@ export default function ConversationList(props: {
                   color={conversation?.color}
                 ></ProfilePicture>
               </div>
-
               <div class="flex flex-col flex-grow">
                 <span class="font-medium truncate">{conversation.name}</span>
                 <Show when={conversation.is_group}>

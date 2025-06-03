@@ -1,8 +1,3 @@
-import toast, { Toaster } from 'solid-toast';
-import ConversationList from '../components/ConversationList';
-import type { Message } from '../interfaces/Message';
-import type { ChatStore } from '../interfaces/Chat';
-import { createStore } from 'solid-js/store';
 import { io } from 'socket.io-client';
 import { createEffect, onMount } from 'solid-js';
 import Conversation from '../components/Conversation';
@@ -11,6 +6,11 @@ import { showNotifMessageToast } from '../components/MessageToast';
 import ConversationHeader from '../components/ConversationHeader';
 import ProfileFooter from '../components/ProfileFooter';
 import { useParams } from '@solidjs/router';
+import { createStore } from 'solid-js/store';
+import type { Message } from '../interfaces/Message';
+import type { ChatStore } from '../interfaces/Chat';
+import ConversationList from '../components/ConversationList';
+import toast, { Toaster } from 'solid-toast';
 
 export default function Chat() {
   const params = useParams();
