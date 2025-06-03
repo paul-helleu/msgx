@@ -25,7 +25,7 @@ export default function ProfileFooter(props: { user: User | null }) {
           onClick={() => {
             console.log('Ajouter une conversation');
           }}
-          class="text-2xl hover:text-indigo-600 text-gray-600 ml-6"
+          class="text-2xl hover:text-zinc-600 text-gray-600 ml-6"
         />
       </div>
     </div>

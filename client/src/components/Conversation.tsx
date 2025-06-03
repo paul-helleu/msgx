@@ -117,7 +117,7 @@ export default function Conversation(props: {
         />
         <button
           onClick={handleSendMessage}
-          class="text-gray-500 hover:text-indigo-600 transition text-lg ml-1"
+          class="text-gray-500 hover:text-zinc-600 transition text-lg ml-1"
         >
           <FiSend class="text-2xl" />
         </button>

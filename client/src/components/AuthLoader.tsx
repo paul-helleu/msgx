@@ -24,7 +24,7 @@ export default function AuthLoader(props: { children: JSX.Element }) {
       when={!loading()}
       fallback={
         <div class="fixed inset-0 flex items-center justify-center bg-white z-50">
-          <div class="animate-spin rounded-full h-16 w-16 border-4 border-indigo-500 border-t-transparent"></div>
+          <div class="animate-spin rounded-full h-16 w-16 border-4 border-zinc-500 border-t-transparent"></div>
         </div>
       }
     >
