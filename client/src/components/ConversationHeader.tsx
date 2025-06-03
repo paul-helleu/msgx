@@ -20,7 +20,7 @@ export default function ConversationHeader(props: {
         </h2>
       </div>
       <button
-        class="text-indigo-600 hover:text-indigo-800 transition text-xs font-medium"
+        class="text-zinc-600 hover:text-zinc-800 transition text-xs font-medium"
         onClick={() => setShowModal(true)}
       >
         Voir les membres

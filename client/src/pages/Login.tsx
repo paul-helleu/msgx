@@ -44,7 +44,7 @@ export default function Login() {
                 id="username"
                 onInput={(e) => setUsername(e.currentTarget.value)}
                 required
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-600 sm:text-sm/6"
               />
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function Login() {
                 onInput={(e) => setPassword(e.currentTarget.value)}
                 autocomplete="current-password"
                 required
-                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-400 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-zinc-600 sm:text-sm/6"
               />
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              class="flex w-full justify-center rounded-md bg-zinc-900 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              class="flex w-full justify-center rounded-md bg-zinc-900 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600"
             >
               Se Connecter
             </button>
@@ -85,7 +85,7 @@ export default function Login() {
           Pas encore connecté ?
           <a
             href="/register"
-            class="font-semibold text-indigo-600 hover:text-indigo-500 pl-2"
+            class="font-semibold text-zinc-600 hover:text-zinc-500 pl-2"
           >
             Créer un compte ici
           </a>
