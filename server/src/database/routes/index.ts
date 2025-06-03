@@ -2,6 +2,9 @@ import { Router } from 'express';
 import Message from '../models/Message.ts';
 import Conversation from '../models/Conversation.ts';
 import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
+import { UserConversation } from '../models';
+import userRepository from '../repositories/user.repository.ts';
+import sequelize from '../sequelize.ts';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
@@ -86,138 +89,148 @@ router.post(
   }
 );
 
-// router.get('/users', UserController.getAll);
-// router.get('/conversations', ConversationController.getAll);
-// router.get("/messages", MessageController.getAll);
+router.post(
+  '/conversations/create',
+  isValidToken,
+  async (req: AuthenticatedRequest, res, next) => {
+    const senderId = req.user.id;
+    const { recipients, name } = req.body;
 
-// router.get('/messages', (req, res, next) => {
-//   const limit = req.query?.limit;
-//   if (limit === null) {
-//     res.status(200).json();
-//   }
-// });
+    if (!recipients || !Array.isArray(recipients)) {
+      res.status(400).json({
+        message: 'Recipients must be an array',
+        errors: {
+          recipients: { code: 'INVALID_TYPE', message: 'Expected array' },
+        },
+      });
+      return;
+    }
 
-// router.post('/conversations/create', async (req, res, next) => {
-//   // check authentification
-//   const senderId = 1;
+    if (recipients.length > MAX_USER_PER_CONVERSATION) {
+      res.status(400).json({
+        message: `Impossible to add more than ${MAX_USER_PER_CONVERSATION} user per conversation`,
+        errors: {
+          sender: {
+            code: '',
+            message: '',
+          },
+        },
+      });
+      return;
+    }
 
-//   const recipients: [] | null = req.body?.recipients;
-//   if (
-//     recipients === null ||
-//     !Array.isArray(recipients) ||
-//     recipients.length > MAX_USER_PER_CONVERSATION
-//   ) {
-//     res.status(400).json({
-//       message: 'No recipients found',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
+    if (recipients.length === 0) {
+      res.status(400).json({
+        message: 'At least one recipient is required',
+        errors: {
+          recipients: {
+            code: 'EMPTY_ARRAY',
+            message: 'No recipients provided',
+          },
+        },
+      });
+      return;
+    }
 
-//   recipients.forEach(async (recipientId: string) => {
-//     const recipientIdNumber = parseInt(recipientId, 10);
-//     if (!Number.isNaN(recipientIdNumber)) {
-//       res.status(400).json({
-//         message: 'Recipients must contains recipientIds',
-//         errors: {
-//           sender: {
-//             code: '',
-//             message: '',
-//           },
-//         },
-//       });
-//       return;
-//     }
+    const uniqueRecipients = [...new Set(recipients)];
+    if (uniqueRecipients.length !== recipients.length) {
+      res.status(400).json({
+        message: 'Duplicate recipients found',
+        errors: {
+          recipients: {
+            code: 'DUPLICATES',
+            message: 'Recipients must be unique',
+          },
+        },
+      });
+      return;
+    }
 
-//     const recipient = await userRepository.findById(recipientIdNumber);
-//     if (recipient === null) {
-//       res.json({
-//         message: `${recipientIdNumber} is not a valid recipientId`,
-//         errors: {
-//           sender: {
-//             code: '',
-//             message: '',
-//           },
-//         },
-//       });
-//       return;
-//     }
-//   });
+    const recipientUsers = [];
+    for (const recipientUsername of recipients) {
+      const recipient = await userRepository.findByUsername(recipientUsername);
+      if (!recipient) {
+        res.status(400).json({
+          message: `No user ${recipientUsername} found!`,
+          errors: { sender: { code: '', message: '' } },
+        });
+        return;
+      }
 
-//   const newConversation = await Conversation.create({
-//     channel_id: crypto.randomUUID(),
-//     name: '',
-//     is_group: false,
-//   });
-//   await UserConversation.create({
-//     conversation_id: newConversation.id,
-//     user_id: senderId,
-//   });
+      if (recipient.id === senderId) {
+        res.status(400).json({
+          message: 'You cannot create a conversation with yourself',
+          errors: { sender: { code: '', message: '' } },
+        });
+        return;
+      }
 
-//   recipients.forEach(async (recipientId) => {
-//     await UserConversation.create({
-//       conversation_id: newConversation.id,
-//       user_id: recipientId,
-//     });
-//   });
-// });
+      recipientUsers.push(recipient);
+    }
 
-// router.post('/conversations/:channelId/messages', async (req, res, next) => {
-//   // check authentification
-//   const senderId = 1;
+    if (recipientUsers.length === 1) {
+      const recipient = recipientUsers[0];
 
-//   const channelId = parseInt(req.params.channelId, 10);
-//   if (Number.isNaN(channelId)) {
-//     res.status(400).json({
-//       message: 'Invalid Id must be an integer',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
+      const conversations = await Conversation.findAll({
+        where: { is_group: false },
+        include: [
+          {
+            association: 'Users',
+            where: {
+              id: [senderId, recipient.id],
+            },
+            required: true,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      });
 
-//   const content: string | null = req.body?.content;
-//   if (content === null || content.length === 0) {
-//     res.status(400).json({
-//       message: 'Message must contains content',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
+      const matchingConversation = conversations.find(
+        (conv) => conv.Users && conv.Users.length === 2
+      );
 
-//   const conversation = await conversationRepository.findByChannelId(channelId);
-//   if (conversation === null) {
-//     res.status(400).json({
-//       message: 'No conversation found, need to create the conversation',
-//       errors: {
-//         sender: {
-//           code: '',
-//           message: '',
-//         },
-//       },
-//     });
-//     return;
-//   }
+      if (matchingConversation) {
+        res.status(200).json({
+          message: 'Conversation already exists',
+          conversation: matchingConversation,
+        });
+        return;
+      }
+    }
 
-//   const message = await Message.create({
-//     content,
-//     conversation_id: conversation.id,
-//     sender_id: senderId,
-//   });
-// });
+    const groupName = name ? name.toString() : 'New Conversation';
+    const isGroup = recipientUsers.length > 1;
+
+    const transaction = await sequelize.transaction();
+    try {
+      const newConversation = await Conversation.create(
+        {
+          channel_id: crypto.randomUUID(),
+          name: isGroup ? groupName : '',
+          is_group: isGroup,
+        },
+        { transaction }
+      );
+
+      const userConversations = [
+        { conversation_id: newConversation.id, user_id: senderId },
+        ...recipientUsers.map((user) => ({
+          conversation_id: newConversation.id,
+          user_id: user.id,
+        })),
+      ];
+
+      await UserConversation.bulkCreate(userConversations, { transaction });
+      await transaction.commit();
+
+      res.status(201).json({ conversation: newConversation });
+    } catch (error) {
+      await transaction.rollback();
+      next(error);
+    }
+  }
+);
 
 export default router;

@@ -16,7 +16,7 @@ class Conversation extends Model<
   declare channel_id: string;
   declare name: string;
   declare is_group: boolean;
-  declare color: string;
+  declare color?: string;
   declare createdAt?: CreationOptional<Date>;
   declare Users?: User[];
 }
@@ -44,6 +44,7 @@ Conversation.init(
     color: {
       type: DataTypes.STRING,
       allowNull: true,
+      defaultValue: 'bg-emerald-500',
     },
   },
   {
