@@ -20,8 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
@@ -86,6 +85,39 @@ app.get(
         res.json({ id, username, color });
       }
     } catch (error) {
+      res.status(500).json({ message: 'Server Error', error });
+    }
+  }
+);
+
+app.post(
+  '/api/auth/users',
+  isValidToken,
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const userId = req.user.id;
+      const { search } = req.body;
+      console.log(req.user.id);
+
+      const whereClause: any = {
+        id: { [Op.ne]: userId },
+      };
+      if (search) {
+        whereClause.username = {
+          [Op.iLike]: `%${search}%`,
+        };
+      }
+
+      const users = await User.findAll({
+        where: whereClause,
+        order: [['username', 'ASC']],
+        limit: 5,
+        attributes: ['id', 'username', 'color'],
+      });
+
+      res.json(users);
+    } catch (error) {
+      console.log(error);
       res.status(500).json({ message: 'Server Error', error });
     }
   }
@@ -205,4 +237,7 @@ sequelize.sync().then(() => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT);
+// app.listen(PORT);
+app.listen(3000, '0.0.0.0', () => {
+  console.log('API server listening on http://0.0.0.0:3000');
+});

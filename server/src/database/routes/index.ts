@@ -192,7 +192,7 @@ router.post(
       );
 
       if (matchingConversation) {
-        res.status(200).json({
+        res.status(202).json({
           message: 'Conversation already exists',
           conversation: matchingConversation,
         });

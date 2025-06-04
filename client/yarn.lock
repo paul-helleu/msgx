@@ -767,6 +767,11 @@
     "@tailwindcss/oxide" "4.1.7"
     tailwindcss "4.1.7"
 
+"@thisbeyond/solid-select@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@thisbeyond/solid-select/-/solid-select-0.15.0.tgz#3b1aeca206cfa5984b27c3bdb9f4aa7b9e7903cf"
+  integrity sha512-L3QnA5vm09JWNqLR4QqEIi7cgfs9/1sJbFjyEnPskjKpxEvb4G+Iy5cyd1qhZ2vAIZ9vaLd3udts3kefayPsMg==
+
 "@tybys/wasm-util@^0.9.0":
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/@tybys/wasm-util/-/wasm-util-0.9.0.tgz#3e75eb00604c8d6db470bf18c37b7d984a0e3355"

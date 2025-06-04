@@ -47,7 +47,7 @@ export default function ConversationList(props: {
   return (
     <div class="flex flex-col md:flex-col h-screen p-4 m-h-screen">
       <h2 class="text-xl font-bold mb-4">Conversations</h2>
-      <ul class="space-y-2">
+      <ul class="space-y-2 overflow-y-auto pr-1 flex-1 min-h-0">
         <For each={conversations()}>
           {(conversation) => (
             <li

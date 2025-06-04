@@ -14,7 +14,7 @@ import { useApp } from '../components/AppContext';
 export default function Chat() {
   const params = useParams();
   const channelId = () => params.channelId;
-  const socket = io('http://127.0.0.1:3300');
+  const socket = io('http://localhost:3300');
   const { user } = useAuth();
 
   const { storeChat, setStoreChat, setUserStatus } = useApp();
@@ -99,11 +99,13 @@ export default function Chat() {
     <div class="flex flex-col md:flex-row h-screen">
       <div class="bg-red-500 bg-orange-500 bg-amber-500 bg-yellow-500 bg-lime-500 bg-green-500 bg-emerald-500 bg-teal-500 bg-cyan-500 bg-sky-500 bg-blue-500 bg-violet-500 bg-purple-500 bg-fuchsia-500 bg-pink-500 bg-rose-500"></div>
       <aside class="w-full md:w-1/4 border-r border-gray-200 bg-gray-50 flex flex-col h-full">
-        <ConversationList
-          conversations={storeChat.conversations}
-          channelId={channelId()}
-          user={user()}
-        />
+        <div class="flex-1 min-h-0">
+          <ConversationList
+            conversations={storeChat.conversations}
+            channelId={channelId()}
+            user={user()}
+          />
+        </div>
         <ProfileFooter user={user()} />
       </aside>
       <main class="flex-1 flex flex-col justify-between">

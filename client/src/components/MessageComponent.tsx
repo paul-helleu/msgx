@@ -20,7 +20,6 @@ export default function MessageComponent(props: {
       ) : (
         <div class="w-8" />
       )}
-
       <div
         class={`flex flex-col w-1/1 ${
           props.sendByMe ? 'items-end' : 'items-start'
@@ -33,7 +32,7 @@ export default function MessageComponent(props: {
             }`}
           >
             <span class="font-bold text-gray-600">
-              {props.msg.Sender.username}
+              {props.sendByMe ? 'Moi' : props.msg.Sender.username}
             </span>
             {' · '}
             {new Date(props.msg.createdAt).toLocaleString('fr-FR', {
@@ -46,7 +45,7 @@ export default function MessageComponent(props: {
           </div>
         )}
         <div
-          class={`px-4 py-2 rounded-lg shadow text-sm break-words max-w-4/5 ${
+          class={`px-4 py-2 rounded-lg shadow text-sm break-all whitespace-pre-wrap max-w-[80%] ${
             props.sendByMe
               ? 'bg-zinc-900 text-white rounded-tr-none'
               : 'bg-gray-200 text-gray-900 rounded-tl-none'

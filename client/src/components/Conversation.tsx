@@ -65,6 +65,7 @@ export default function Conversation(props: {
   const currentChannelId = () => props.currentConversation?.channel_id ?? '';
 
   const [messageContent, setMessageContent] = createSignal('');
+  let messageScrollRef: HTMLDivElement | undefined;
 
   const handleSendMessage = () => {
     const content = messageContent().trim();
@@ -93,10 +94,24 @@ export default function Conversation(props: {
       fetchMessage(currentChannelId(), setStoreChat);
     }
   });
+  createEffect(() => {
+    messages(); // Trigger effect when messages change
+    queueMicrotask(() => {
+      if (messageScrollRef) {
+        messageScrollRef.scrollTo({
+          top: messageScrollRef.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    });
+  });
 
   return (
     <div class="flex-1 flex flex-col justify-between bg-white p-4">
-      <div class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]">
+      <div
+        ref={messageScrollRef}
+        class="overflow-y-auto mb-4 space-y-2 max-h-[calc(100vh-160px)]"
+      >
         <For each={prepareMessages(messages())}>
           {(msg) => (
             <MessageComponent

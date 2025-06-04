@@ -1,13 +1,22 @@
+import { createServer } from 'http';
 import { Server } from 'socket.io';
 declare module 'socket.io' {
   interface Socket {
     username?: string;
   }
 }
-
 const port = Number(process.env.SERVER_SOCKET_PORT) || 3300;
-const io = new Server(port, {
-  cors: { origin: process.env.SERVER_CLIENT_URI! },
+
+const httpServer = createServer();
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+});
+
+httpServer.listen(port, '0.0.0.0', () => {
+  console.log(`✅ Socket.IO listening on http://192.168.168.99:${port}`);
 });
 
 io.on('connection', (socket) => {
