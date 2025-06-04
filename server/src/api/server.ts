@@ -111,7 +111,7 @@ app.post(
       const users = await User.findAll({
         where: whereClause,
         order: [['username', 'ASC']],
-        limit: 5,
+        limit: 10,
         attributes: ['id', 'username', 'color'],
       });
 
@@ -156,6 +156,7 @@ app.get(
             attributes: ['id', 'username', 'color'],
           },
         ],
+        order: [['updatedAt', 'DESC']],
       });
       const result = conversations.map((conversation) => {
         const users = conversation.Users || [];

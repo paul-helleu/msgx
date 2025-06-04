@@ -18,6 +18,7 @@ class Conversation extends Model<
   declare is_group: boolean;
   declare color?: string;
   declare createdAt?: CreationOptional<Date>;
+  declare updatedAt?: CreationOptional<Date>;
   declare Users?: User[];
 }
 
@@ -50,6 +51,7 @@ Conversation.init(
   {
     sequelize,
     tableName: 'conversations',
+    timestamps: true,
   }
 );
 

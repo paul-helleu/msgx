@@ -32,6 +32,17 @@ export default function Chat() {
       senderId: user()?.id,
     });
 
+    setStoreChat('conversations', (convs) => {
+      const index = convs.findIndex(
+        (conv) => conv.channel_id === storeChat.currentConversation?.channel_id
+      );
+      if (index === -1) return convs;
+      const updatedConvs = [...convs];
+      const [conv] = updatedConvs.splice(index, 1);
+      updatedConvs.unshift(conv);
+      return updatedConvs;
+    });
+
     if (!storeChat.currentConversation?.channel_id) {
       return;
     }
@@ -63,13 +74,24 @@ export default function Chat() {
         username: message.Sender.username,
       });
 
-      setStoreChat('conversations', (convs) =>
-        convs.map((conv) =>
+      setStoreChat('conversations', (convs) => {
+        const updatedConvs = convs.map((conv) =>
           conv.channel_id === channelId
             ? { ...conv, newMessagesCount: (conv.newMessagesCount || 0) + 1 }
             : conv
-        )
-      );
+        );
+
+        const index = updatedConvs.findIndex(
+          (conv) => conv.channel_id === channelId
+        );
+
+        if (index > -1) {
+          const [conv] = updatedConvs.splice(index, 1);
+          updatedConvs.unshift(conv);
+        }
+
+        return updatedConvs;
+      });
     });
 
     const username = user()?.username;

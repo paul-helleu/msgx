@@ -71,6 +71,9 @@ router.post(
         content: content.trim(),
       });
 
+      conversation.changed('updatedAt', true);
+      await conversation.save();
+
       res.status(201).json({
         message: 'Message sent successfully',
         data: {
@@ -94,7 +97,7 @@ router.post(
   isValidToken,
   async (req: AuthenticatedRequest, res, next) => {
     const senderId = req.user.id;
-    const { recipients, name } = req.body;
+    const { recipients, name, color } = req.body;
 
     if (!recipients || !Array.isArray(recipients)) {
       res.status(400).json({
@@ -200,7 +203,8 @@ router.post(
       }
     }
 
-    const groupName = name ? name.toString() : 'New Conversation';
+    const groupName = name ? name.toString() : 'Nouvelle Conversation';
+    const groupColor = color ? color : 'bg-emerald-500';
     const isGroup = recipientUsers.length > 1;
 
     const transaction = await sequelize.transaction();
@@ -209,6 +213,7 @@ router.post(
         {
           channel_id: crypto.randomUUID(),
           name: isGroup ? groupName : '',
+          color: groupColor,
           is_group: isGroup,
         },
         { transaction }
