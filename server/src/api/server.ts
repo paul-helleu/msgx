@@ -239,6 +239,4 @@ sequelize.sync().then(() => {
 const PORT = process.env.PORT || 3000;
 
 // app.listen(PORT);
-app.listen(3000, '0.0.0.0', () => {
-  console.log('API server listening on http://0.0.0.0:3000');
-});
+app.listen(3000, '0.0.0.0');

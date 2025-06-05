@@ -230,7 +230,22 @@ router.post(
       await UserConversation.bulkCreate(userConversations, { transaction });
       await transaction.commit();
 
-      res.status(201).json({ conversation: newConversation });
+      const usersDto = recipientUsers.map((user) => ({
+        id: user.id,
+        username: user.username,
+        color: user.color,
+      }));
+      const memberCount = usersDto.length + 1;
+
+      res.status(201).json({
+        conversation: {
+          conversation: {
+            ...newConversation.toJSON(),
+            members_count: memberCount,
+            Users: usersDto,
+          },
+        },
+      });
     } catch (error) {
       await transaction.rollback();
       next(error);

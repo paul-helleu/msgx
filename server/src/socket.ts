@@ -15,9 +15,7 @@ const io = new Server(httpServer, {
   },
 });
 
-httpServer.listen(port, '0.0.0.0', () => {
-  console.log(`✅ Socket.IO listening on http://192.168.168.99:${port}`);
-});
+httpServer.listen(port, '0.0.0.0');
 
 io.on('connection', (socket) => {
   socket.on('joinChannel', (channelId) => {
@@ -48,6 +46,18 @@ io.on('connection', (socket) => {
 
   socket.on('i-am-online', ({ toSocketId, username }) => {
     io.to(toSocketId).emit('i-am-online', username);
+  });
+
+  socket.on('conversationCreated', ({ participants, conversation }) => {
+    participants.forEach((username: string) => {
+      io.to(username).emit('new_conversation', conversation);
+    });
+  });
+
+  socket.on('announce-presence', (username) => {
+    socket.username = username;
+    socket.join(username);
+    socket.broadcast.emit('user-connected', username);
   });
 
   socket.on('disconnect', () => {

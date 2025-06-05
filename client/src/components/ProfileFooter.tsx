@@ -6,8 +6,15 @@ import { BiRegularMessageAdd } from 'solid-icons/bi';
 import { FiLogOut } from 'solid-icons/fi';
 import '@thisbeyond/solid-select/style.css';
 import ConversationCreation from './ConversationCreation';
+import type { Socket } from 'socket.io-client';
 
-export default function ProfileFooter({ user }: { user: User | null }) {
+export default function ProfileFooter({
+  user,
+  socket,
+}: {
+  user: User | null;
+  socket: Socket;
+}) {
   const [showModal, setShowModal] = createSignal(false);
 
   return (
@@ -41,7 +48,7 @@ export default function ProfileFooter({ user }: { user: User | null }) {
         setIsOpen={setShowModal}
         title="Créer une conversation"
       >
-        <ConversationCreation setIsOpen={setShowModal} />
+        <ConversationCreation socket={socket} setIsOpen={setShowModal} />
       </ModalComponent>
     </>
   );

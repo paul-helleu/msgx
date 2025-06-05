@@ -1,10 +1,19 @@
-import { createSignal, createResource, onMount, Show } from 'solid-js';
+import {
+  createSignal,
+  createResource,
+  onMount,
+  Show,
+  onCleanup,
+} from 'solid-js';
 import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
 import { Select } from '@thisbeyond/solid-select';
 import '@thisbeyond/solid-select/style.css';
 import { useNavigate } from '@solidjs/router';
 import { useApp } from './AppContext';
+import type { Socket } from 'socket.io-client';
+import type { ConversationResponse } from '../interfaces/Conversation';
+import toast from 'solid-toast';
 
 const colorOptions = [
   'bg-red-500',
@@ -27,6 +36,7 @@ const colorOptions = [
 
 export default function ConversationCreation(props: {
   setIsOpen: (value: boolean) => void;
+  socket: Socket;
 }) {
   const [search, setSearch] = createSignal('');
   const [selectedUsers, setSelectedUsers] = createSignal<any[]>([]);
@@ -38,9 +48,12 @@ export default function ConversationCreation(props: {
   const navigate = useNavigate();
   const { switchConversation } = useApp();
 
+  const { setStoreChat, storeChat } = useApp();
+
   onMount(() => {
     setSearch('');
   });
+
   const fetchUsers = async (term: string) =>
     fetch('http://localhost:3000/api/auth/users', {
       method: 'POST',
@@ -63,6 +76,7 @@ export default function ConversationCreation(props: {
         color: u.color,
       }));
   };
+
   const handleSubmit = async () => {
     const selected = selectedUsers();
     if (!selected.length) return;
@@ -87,12 +101,27 @@ export default function ConversationCreation(props: {
     );
 
     const data = await response.json();
+
     if (response.status == 202 || response.status == 201) {
+      const conversation = data.conversation.conversation;
+
+      props.socket.emit('conversationCreated', {
+        participants: recipients,
+        conversation,
+      });
+
+      setStoreChat('conversations', (prev) => [conversation, ...prev]);
+
       props.setIsOpen(false);
-      switchConversation(data.conversation.channel_id as string);
-      navigate(`/conversation/${data.conversation.channel_id}`);
+      switchConversation(conversation.channel_id);
+      navigate(`/conversation/${conversation.channel_id}`);
+    } else {
+      toast.error(
+        'Error while sending the message, verify your internet connection!'
+      );
     }
   };
+
   return (
     <div class="min-h-[22rem] w-full flex flex-col justify-between p-2 space-y-4 bg-white rounded">
       <div class="space-y-3">

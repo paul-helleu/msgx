@@ -4,11 +4,13 @@ import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
 import { useNavigate } from '@solidjs/router';
 import { useApp } from './AppContext';
+import type { Socket } from 'socket.io-client';
 
 export default function ConversationList(props: {
   conversations: ConversationResponse[];
   user: User | null;
   channelId: string;
+  socket: Socket;
 }) {
   const conversations = () => props.conversations as ConversationResponse[];
   const navigate = useNavigate();
@@ -33,6 +35,10 @@ export default function ConversationList(props: {
       .catch((err) => {
         console.log(err);
       });
+
+    props.socket.on('new_conversation', (conversation) => {
+      setStoreChat('conversations', (prev) => [conversation, ...prev]);
+    });
   });
 
   async function handleRswitchChannel(e: Event) {
