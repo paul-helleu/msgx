@@ -9,6 +9,6 @@ const router = Router();
 router.use('/conversations', conversationRoutes);
 router.use('/messages', messageRoutes);
 router.use('/users', userRoutes);
-router.use('/', authRoutes); // TODO: change the root endpoint
+router.use('/', authRoutes); // TODO: change to auth
 
 export default router;

@@ -21,6 +21,7 @@ export default function ConversationList(props: {
       headers: {
         authorization: `${localStorage.getItem('token')}`,
       },
+      credentials: 'include',
     })
       .then((res) => {
         res.json().then((json) => {

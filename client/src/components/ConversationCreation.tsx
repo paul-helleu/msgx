@@ -55,6 +55,7 @@ export default function ConversationCreation(props: {
         authorization: `${localStorage.getItem('token')}`,
       },
       body: JSON.stringify({ search: term }),
+      credentials: 'include',
     }).then((res) => (res.ok ? res.json() : []));
 
   const [users] = createResource(search, fetchUsers);
@@ -90,6 +91,7 @@ export default function ConversationCreation(props: {
           Authorization: `${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(payload),
+        credentials: 'include',
       }
     );
 

@@ -4,8 +4,8 @@ import {
   type CreationOptional,
   type InferAttributes,
   type InferCreationAttributes,
-} from "sequelize";
-import sequelize from "../database/sequelize.ts";
+} from 'sequelize';
+import sequelize from '../database/sequelize.ts';
 
 class Message extends Model<
   InferAttributes<Message>,
@@ -29,21 +29,21 @@ Message.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "conversations",
-        key: "id",
+        model: 'conversations',
+        key: 'id',
       },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
     sender_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "users",
-        key: "id",
+        model: 'users',
+        key: 'id',
       },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
     content: {
       type: DataTypes.TEXT,
@@ -52,7 +52,7 @@ Message.init(
   },
   {
     sequelize,
-    tableName: "messages",
+    tableName: 'messages',
     timestamps: true,
   }
 );

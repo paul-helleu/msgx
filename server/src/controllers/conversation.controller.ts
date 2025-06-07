@@ -1,7 +1,6 @@
-import type { NextFunction, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { Conversation, User, UserConversation } from '../models';
 import { ConversationService } from '../services/conversation.service';
-import type { AuthenticatedRequest } from '../api/auth';
 import sequelize from '../database/sequelize';
 import { Op } from 'sequelize';
 import { UserService } from '../services/user.service';
@@ -19,11 +18,11 @@ export class ConversationController {
   }
 
   public async createNewConversation(
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction
   ) {
-    const senderId = req.user.id;
+    const senderId = req.user!.id;
     const { recipients, name, color } = req.body;
 
     if (!recipients || !Array.isArray(recipients)) {
@@ -78,9 +77,7 @@ export class ConversationController {
 
     const recipientUsers = [];
     for (const recipientUsername of recipients) {
-      const recipient = await this.userService.findByUsername(
-        recipientUsername
-      );
+      const recipient = await this.userService.getByUsername(recipientUsername);
       if (!recipient) {
         res.status(400).json({
           message: `No user ${recipientUsername} found!`,
@@ -181,9 +178,9 @@ export class ConversationController {
     }
   }
 
-  public async getUserConversation(req: AuthenticatedRequest, res: Response) {
+  public async getUserConversation(req: Request, res: Response) {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
 
       // Récupère les conversations de l'utilisateur
       const userConversations = await UserConversation.findAll({

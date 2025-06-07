@@ -1,7 +1,6 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { Conversation, Message, User } from '../models';
 import { MessageService } from '../services/message.service';
-import type { AuthenticatedRequest } from '../api/auth';
 
 export class MessageController {
   private messageService: MessageService;
@@ -10,11 +9,11 @@ export class MessageController {
     this.messageService = new MessageService();
   }
 
-  public async create(req: AuthenticatedRequest, res: Response) {
+  public async create(req: Request, res: Response) {
     try {
       const { channelId } = req.params;
       const { content } = req.body;
-      const senderId = req.user.id;
+      const senderId = req.user?.id as number;
 
       if (!channelId || channelId.trim().length === 0) {
         res.status(400).json({
@@ -63,7 +62,7 @@ export class MessageController {
 
       const message = await Message.create({
         conversation_id: conversation.id,
-        sender_id: parseInt(senderId, 10),
+        sender_id: senderId,
         content: content.trim(),
       });
 
@@ -87,10 +86,7 @@ export class MessageController {
     }
   }
 
-  public async getConversationMessages(
-    req: AuthenticatedRequest,
-    res: Response
-  ) {
+  public async getConversationMessages(req: Request, res: Response) {
     try {
       const channelId = req.params.channel_id;
       const messages = await Message.findAll({

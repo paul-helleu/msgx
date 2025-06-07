@@ -6,16 +6,17 @@ declare module 'socket.io' {
   }
 }
 const port = Number(process.env.SERVER_SOCKET_PORT) || 3300;
+const client = process.env.SERVER_CLIENT_URI;
 
 const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: {
-    origin: '*',
+    origin: client,
   },
 });
 
-httpServer.listen(port, '0.0.0.0');
+httpServer.listen(port);
 
 io.on('connection', (socket) => {
   socket.on('joinChannel', (channelId) => {

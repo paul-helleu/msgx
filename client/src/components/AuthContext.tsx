@@ -36,11 +36,13 @@ export function AuthProvider(props: { children: JSX.Element }) {
 
     const res = await fetch('http://localhost:3000/api/valid_token', {
       headers: { authorization: `${token}` },
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Invalid token');
 
     const userRes = await fetch('http://localhost:3000/api/users/current', {
       headers: { authorization: `${token}` },
+      credentials: 'include',
     });
     if (!userRes.ok) throw new Error('User fetch failed');
 
@@ -53,6 +55,7 @@ export function AuthProvider(props: { children: JSX.Element }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
+      credentials: 'include',
     });
     if (!res.ok) throw new Error('Login failed');
 
@@ -65,6 +68,7 @@ export function AuthProvider(props: { children: JSX.Element }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
+      credentials: 'include',
     });
     if (!res.ok) {
       setError("Ce nom d'utilisateur est déjà pris");

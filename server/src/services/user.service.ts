@@ -7,7 +7,11 @@ export class UserService {
     this.userRepository = new UserRepository();
   }
 
-  public async findByUsername(username: string) {
+  public async getByUsername(username: string) {
     return this.userRepository.findByUsername(username);
+  }
+
+  public async getUserById(id: number) {
+    return this.userRepository.findById(id);
   }
 }

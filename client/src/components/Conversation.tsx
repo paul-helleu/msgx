@@ -43,6 +43,7 @@ const fetchMessage = (
     headers: {
       authorization: `${localStorage.getItem('token')}`,
     },
+    credentials: 'include',
   })
     .then((res) =>
       res

@@ -56,6 +56,7 @@ export default function Chat() {
           Authorization: `${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ content: message.content }),
+        credentials: 'include',
       }
     ).catch((err: Error) => {
       toast.error('Une erreur est survenu: ' + err.message);

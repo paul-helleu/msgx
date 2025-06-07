@@ -1,7 +1,6 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { User } from '../models';
 import { UserService } from '../services/user.service';
-import type { AuthenticatedRequest } from '../api/auth';
 import { Op } from 'sequelize';
 
 export class UserController {
@@ -11,9 +10,9 @@ export class UserController {
     this.userService = new UserService();
   }
 
-  public async getCurrent(req: AuthenticatedRequest, res: Response) {
+  public async getCurrent(req: Request, res: Response) {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       const user = await User.findOne({ where: { id: userId } });
       if (user) {
         const { id, username, color } = user.toJSON();
@@ -24,9 +23,9 @@ export class UserController {
     }
   }
 
-  public async searchUsers(req: AuthenticatedRequest, res: Response) {
+  public async searchUsers(req: Request, res: Response) {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       const { search } = req.body;
 
       const whereClause: any = {
