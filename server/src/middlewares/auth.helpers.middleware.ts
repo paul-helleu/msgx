@@ -9,7 +9,6 @@ export const authHelpers = (
   req.isAuthenticated = () => !!req.user;
 
   req.login = (user) => {
-    console.log(user);
     const token = JwtService.createAccessToken(user.id.toString());
     req.user = user;
     res.cookie('jwt', token, {
