@@ -5,7 +5,7 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
 } from "sequelize";
-import sequelize from "../sequelize.ts";
+import sequelize from "../database/sequelize.ts";
 
 class Message extends Model<
   InferAttributes<Message>,

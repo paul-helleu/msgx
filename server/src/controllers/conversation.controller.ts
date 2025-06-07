@@ -1,101 +1,28 @@
-import { Router } from 'express';
-import Message from '../models/Message.ts';
-import Conversation from '../models/Conversation.ts';
-import { isValidToken, type AuthenticatedRequest } from '../../api/auth.ts';
-import { UserConversation } from '../models';
-import userRepository from '../repositories/user.repository.ts';
-import sequelize from '../sequelize.ts';
+import type { NextFunction, Response } from 'express';
+import { Conversation, User, UserConversation } from '../models';
+import { ConversationService } from '../services/conversation.service';
+import type { AuthenticatedRequest } from '../api/auth';
+import sequelize from '../database/sequelize';
+import { Op } from 'sequelize';
+import { UserService } from '../services/user.service';
 
 const MAX_USER_PER_CONVERSATION =
   Number(process.env.MAX_USER_PER_CONVERSATION) || 10;
 
-const router = Router();
+export class ConversationController {
+  private conversationService: ConversationService;
+  private userService: UserService;
 
-router.post(
-  '/messages/:channelId',
-  isValidToken,
-  async (req: AuthenticatedRequest, res, next) => {
-    try {
-      const { channelId } = req.params;
-      const { content } = req.body;
-      const senderId = req.user.id;
-
-      if (!channelId || channelId.trim().length === 0) {
-        res.status(400).json({
-          message: 'Validation failed',
-          errors: {
-            channel_id: {
-              code: 'REQUIRED_FIELD',
-              message: 'Channel ID is required',
-            },
-          },
-        });
-        return;
-      }
-
-      if (!content || content.trim().length === 0) {
-        res.status(400).json({
-          message: 'Validation failed',
-          errors: {
-            content: {
-              code: 'REQUIRED_FIELD',
-              message: 'Message content is required and cannot be empty',
-            },
-          },
-        });
-        return;
-      }
-
-      const conversation = await Conversation.findOne({
-        where: {
-          channel_id: channelId.trim(),
-        },
-      });
-
-      if (!conversation) {
-        res.status(404).json({
-          message: 'Channel not found',
-          errors: {
-            channelId: {
-              code: 'NOT_FOUND',
-              message: 'No conversation found for this channel ID',
-            },
-          },
-        });
-        return;
-      }
-
-      const message = await Message.create({
-        conversation_id: conversation.id,
-        sender_id: parseInt(senderId, 10),
-        content: content.trim(),
-      });
-
-      conversation.changed('updatedAt', true);
-      await conversation.save();
-
-      res.status(201).json({
-        message: 'Message sent successfully',
-        data: {
-          id: message.id,
-          conversationId: message.conversation_id,
-          channelId: conversation.channel_id,
-          senderId: message.sender_id,
-          content: message.content,
-          createdAt: message.createdAt,
-          updatedAt: message.updatedAt,
-        },
-      });
-    } catch (err) {
-      res.status(500).json({ status: 'Internal server error' });
-    }
+  constructor() {
+    this.conversationService = new ConversationService();
+    this.userService = new UserService();
   }
-);
 
-router.post(
-  '/conversations/create',
-  isValidToken,
-  async (req: AuthenticatedRequest, res, next) => {
+  public async createNewConversation(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     const senderId = req.user.id;
     const { recipients, name, color } = req.body;
 
@@ -151,7 +78,9 @@ router.post(
 
     const recipientUsers = [];
     for (const recipientUsername of recipients) {
-      const recipient = await userRepository.findByUsername(recipientUsername);
+      const recipient = await this.userService.findByUsername(
+        recipientUsername
+      );
       if (!recipient) {
         res.status(400).json({
           message: `No user ${recipientUsername} found!`,
@@ -251,6 +180,70 @@ router.post(
       next(error);
     }
   }
-);
 
-export default router;
+  public async getUserConversation(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = req.user.id;
+
+      // Récupère les conversations de l'utilisateur
+      const userConversations = await UserConversation.findAll({
+        where: { user_id: userId },
+        attributes: ['conversation_id'],
+        raw: true,
+      });
+
+      const conversationIds = userConversations.map((uc) => uc.conversation_id);
+
+      const conversations = await Conversation.findAll({
+        where: { id: { [Op.in]: conversationIds } },
+        include: [
+          {
+            model: User,
+            through: { attributes: [] }, // Exclut UserConversation
+            attributes: ['id', 'username', 'color'],
+          },
+        ],
+        order: [['updatedAt', 'DESC']],
+      });
+      const result = conversations.map((conversation) => {
+        const users = conversation.Users || [];
+        const isGroup = conversation.is_group;
+
+        if (!isGroup) {
+          const otherUser = users.find((user) => user.id !== userId);
+          return {
+            id: conversation.id,
+            is_group: false,
+            channel_id: conversation.channel_id,
+            name: otherUser?.username,
+            color: otherUser?.color,
+            Users: otherUser
+              ? [
+                  {
+                    id: otherUser.id,
+                    username: otherUser.username,
+                    color: otherUser.color,
+                  },
+                ]
+              : [],
+          };
+        } else {
+          return {
+            id: conversation.id,
+            is_group: true,
+            color: conversation.color,
+            name: conversation.name,
+            channel_id: conversation.channel_id,
+            members_count: users.length,
+            Users: users.filter((user) => user.id !== userId),
+          };
+        }
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+}

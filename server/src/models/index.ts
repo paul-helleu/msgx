@@ -1,7 +1,7 @@
-import User from './User';
-import Conversation from './Conversation';
-import Message from './Message';
-import UserConversation from './UserConversation';
+import User from './User.ts';
+import Conversation from './Conversation.ts';
+import Message from './Message.ts';
+import UserConversation from './UserConversation.ts';
 
 // Message
 Message.belongsTo(User, { foreignKey: 'sender_id', as: 'Sender' });

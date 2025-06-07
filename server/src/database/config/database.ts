@@ -1,7 +1,3 @@
-// src/database/config/database.ts
-import dotenv from 'dotenv';
-dotenv.config();
-
 export default {
   development: {
     username: process.env.DB_USER || 'postgres',
@@ -11,5 +7,5 @@ export default {
     port: Number(process.env.DB_PORT) || 5432,
     dialect: 'postgres',
     logging: false,
-    }
+  },
 };

@@ -39,7 +39,7 @@ const fetchMessage = (
   currentChannelId: string,
   setStoreChat: SetStoreFunction<ChatStore>
 ) => {
-  fetch(`http://localhost:3000/api/auth/messages/${currentChannelId}`, {
+  fetch(`http://localhost:3000/api/messages/${currentChannelId}`, {
     headers: {
       authorization: `${localStorage.getItem('token')}`,
     },

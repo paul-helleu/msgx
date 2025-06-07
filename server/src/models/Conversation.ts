@@ -5,7 +5,7 @@ import {
   type InferAttributes,
   type InferCreationAttributes,
 } from 'sequelize';
-import sequelize from '../sequelize.ts';
+import sequelize from '../database/sequelize.ts';
 import type { User } from './index.ts';
 
 class Conversation extends Model<

@@ -1,7 +1,7 @@
-import { Message } from "../models";
+import { Message } from '../models';
 
-export default {
-  async findAllByConversationId(
+export class MessageRepository {
+  public async findAllByConversationId(
     conversationId: number,
     limit: number | undefined = undefined
   ) {
@@ -11,5 +11,5 @@ export default {
       },
       limit,
     });
-  },
-};
+  }
+}

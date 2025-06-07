@@ -34,12 +34,12 @@ export function AuthProvider(props: { children: JSX.Element }) {
     const token = localStorage.getItem('token');
     if (!token) throw new Error('Missing token');
 
-    const res = await fetch('http://localhost:3000/api/auth/valid_token', {
+    const res = await fetch('http://localhost:3000/api/valid_token', {
       headers: { authorization: `${token}` },
     });
     if (!res.ok) throw new Error('Invalid token');
 
-    const userRes = await fetch('http://localhost:3000/api/auth/user', {
+    const userRes = await fetch('http://localhost:3000/api/users/current', {
       headers: { authorization: `${token}` },
     });
     if (!userRes.ok) throw new Error('User fetch failed');

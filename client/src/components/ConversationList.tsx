@@ -17,7 +17,7 @@ export default function ConversationList(props: {
   const { storeChat, setStoreChat, userStatus, switchConversation } = useApp();
 
   onMount(async () => {
-    fetch(`http://localhost:3000/api/auth/conversations`, {
+    fetch(`http://localhost:3000/api/conversations`, {
       headers: {
         authorization: `${localStorage.getItem('token')}`,
       },

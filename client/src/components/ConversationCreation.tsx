@@ -1,10 +1,4 @@
-import {
-  createSignal,
-  createResource,
-  onMount,
-  Show,
-  onCleanup,
-} from 'solid-js';
+import { createSignal, createResource, onMount, Show } from 'solid-js';
 import type { User } from '../interfaces/User';
 import ProfilePicture from './ProfilePicture';
 import { Select } from '@thisbeyond/solid-select';
@@ -12,7 +6,6 @@ import '@thisbeyond/solid-select/style.css';
 import { useNavigate } from '@solidjs/router';
 import { useApp } from './AppContext';
 import type { Socket } from 'socket.io-client';
-import type { ConversationResponse } from '../interfaces/Conversation';
 import toast from 'solid-toast';
 
 const colorOptions = [
@@ -48,14 +41,14 @@ export default function ConversationCreation(props: {
   const navigate = useNavigate();
   const { switchConversation } = useApp();
 
-  const { setStoreChat, storeChat } = useApp();
+  const { setStoreChat } = useApp();
 
   onMount(() => {
     setSearch('');
   });
 
   const fetchUsers = async (term: string) =>
-    fetch('http://localhost:3000/api/auth/users', {
+    fetch('http://localhost:3000/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
