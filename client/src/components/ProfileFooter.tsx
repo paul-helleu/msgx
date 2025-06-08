@@ -7,6 +7,7 @@ import { FiLogOut } from 'solid-icons/fi';
 import '@thisbeyond/solid-select/style.css';
 import ConversationCreation from './ConversationCreation';
 import type { Socket } from 'socket.io-client';
+import { redirect, useNavigate } from '@solidjs/router';
 
 export default function ProfileFooter({
   user,
@@ -16,6 +17,7 @@ export default function ProfileFooter({
   socket: Socket;
 }) {
   const [showModal, setShowModal] = createSignal(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -31,7 +33,13 @@ export default function ProfileFooter({
         </div>
         <div class="flex gap-6 text-2xl">
           <FiLogOut
-            onClick={() => console.log('Déconnexion')}
+            onClick={() => {
+              fetch('http://localhost:3000/api/logout', {
+                method: 'POST',
+                credentials: 'include',
+              });
+              navigate('/login');
+            }}
             class="text-red-700 hover:text-red-500"
           />
           <BiRegularMessageAdd
