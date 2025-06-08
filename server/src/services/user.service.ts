@@ -11,7 +11,17 @@ export class UserService {
     return this.userRepository.findByUsername(username);
   }
 
-  public async getUserById(id: number) {
+  public async getById(id: number) {
     return this.userRepository.findById(id);
+  }
+
+  public async searchUsers(search: string, excludeUserId: number) {
+    const cleanSearch = search.trim().replace(/[%_]/g, '\\$&'); // escape % and _ for LIKE
+
+    return await this.userRepository.searchWithExcludeUserId(
+      cleanSearch,
+      excludeUserId,
+      10
+    );
   }
 }

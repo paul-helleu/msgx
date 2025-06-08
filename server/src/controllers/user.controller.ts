@@ -1,7 +1,6 @@
-import type { Request, Response } from 'express';
-import { User } from '../models';
+import type { NextFunction, Request, Response } from 'express';
 import { UserService } from '../services/user.service';
-import { Op } from 'sequelize';
+import { ApiError } from '../utils/errors';
 
 export class UserController {
   private userService: UserService;
@@ -10,43 +9,23 @@ export class UserController {
     this.userService = new UserService();
   }
 
-  public async getCurrent(req: Request, res: Response) {
-    try {
-      const userId = req.user!.id;
-      const user = await User.findOne({ where: { id: userId } });
-      if (user) {
-        const { id, username, color } = user.toJSON();
-        res.json({ id, username, color });
-      }
-    } catch (error) {
-      res.status(500).json({ message: 'Server Error', error });
+  public async getCurrent(req: Request, res: Response, _next: NextFunction) {
+    const user = await this.userService.getById(req.user!.id);
+    if (!user) {
+      throw new ApiError(404, 'User not found', 'USER_NOT_FOUND');
     }
+
+    const { id, username, color } = user.toJSON();
+    res.json({ id, username, color });
   }
 
-  public async searchUsers(req: Request, res: Response) {
-    try {
-      const userId = req.user!.id;
-      const { search } = req.body;
-
-      const whereClause: any = {
-        id: { [Op.ne]: userId },
-      };
-      if (search) {
-        whereClause.username = {
-          [Op.iLike]: `%${search}%`,
-        };
-      }
-
-      const users = await User.findAll({
-        where: whereClause,
-        order: [['username', 'ASC']],
-        limit: 10,
-        attributes: ['id', 'username', 'color'],
-      });
-
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: 'Server Error', error });
+  public async searchUsers(req: Request, res: Response, _next: NextFunction) {
+    const { search } = req.body;
+    if (search === null) {
+      throw new ApiError(400, 'Search query is required', 'INVALID_SEARCH');
     }
+
+    const users = await this.userService.searchUsers(search, req.user!.id);
+    res.status(200).json(users);
   }
 }

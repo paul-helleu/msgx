@@ -19,18 +19,21 @@ export const authenticate = async (
 
     if (decoded.sub && decoded.exp && decoded.exp < nowInSeconds) {
       const newToken = JwtService.createAccessToken(decoded.sub);
-      // res.cookie('jwt', newToken, { httpOnly: true, secure: true });
-      res.cookie('jwt', newToken);
+      res.cookie('jwt', newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
       decoded = jwt.decode(newToken) as jwt.JwtPayload;
     }
 
-    const user = await userService.getUserById(Number(decoded.sub));
+    const user = await userService.getById(Number(decoded.sub));
     if (!user) throw new Error('User not found!');
 
     req.user = user;
     next();
-  } catch (error) {
+  } catch (err) {
     res.clearCookie('jwt');
-    next();
+    next(err);
   }
 };
