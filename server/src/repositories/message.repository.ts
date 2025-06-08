@@ -1,7 +1,7 @@
-import { Message } from '../models';
+import { Conversation, Message, User } from '../models';
 
 export class MessageRepository {
-  public async findAllByConversationId(
+  public findAllByConversationId(
     conversationId: number,
     limit: number | undefined = undefined
   ) {
@@ -10,6 +10,25 @@ export class MessageRepository {
         conversation_id: conversationId,
       },
       limit,
+    });
+  }
+
+  public findAllByConversationChannelId(channelId: string) {
+    return Message.findAll({
+      include: [
+        {
+          model: Conversation,
+          attributes: ['id', 'channel_id'],
+          where: { channel_id: channelId },
+        },
+        {
+          model: User,
+          as: 'Sender',
+          attributes: ['id', 'username', 'color'],
+        },
+      ],
+      attributes: ['createdAt', 'content'],
+      order: [['createdAt', 'ASC']],
     });
   }
 }
