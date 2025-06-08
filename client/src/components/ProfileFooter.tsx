@@ -7,7 +7,7 @@ import { FiLogOut } from 'solid-icons/fi';
 import '@thisbeyond/solid-select/style.css';
 import ConversationCreation from './ConversationCreation';
 import type { Socket } from 'socket.io-client';
-import { redirect, useNavigate } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 
 export default function ProfileFooter({
   user,
@@ -38,6 +38,7 @@ export default function ProfileFooter({
                 method: 'POST',
                 credentials: 'include',
               });
+              socket.disconnect();
               navigate('/login');
             }}
             class="text-red-700 hover:text-red-500"
