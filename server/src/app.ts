@@ -14,8 +14,8 @@ import { errorHandler } from './middlewares/error.middleware.ts';
 const app = express();
 
 const httpsOptions = {
-  key: fs.readFileSync('./certs/localhost-key.pem'),
-  cert: fs.readFileSync('./certs/localhost.pem'),
+  key: fs.readFileSync('./certs/cert.key'),
+  cert: fs.readFileSync('./certs/cert.crt'),
 };
 
 const SERVER_CLIENT_URI = process.env.SERVER_CLIENT_URI as string;

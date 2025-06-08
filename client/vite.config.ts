@@ -8,8 +8,8 @@ export default defineConfig({
   server: {
     port: 5138,
     https: {
-      key: fs.readFileSync('./certs/localhost-key.pem'),
-      cert: fs.readFileSync('./certs/localhost.pem'),
+      key: fs.readFileSync('./certs/cert.key'),
+      cert: fs.readFileSync('./certs/cert.cert'),
     },
     proxy: {
       '/api': {
