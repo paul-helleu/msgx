@@ -31,7 +31,7 @@ export function AuthProvider(props: { children: JSX.Element }) {
   const [user, setUser] = createSignal<User | null>(null);
 
   async function fetchUserData() {
-    const userRes = await fetch('http://localhost:3000/api/users/current', {
+    const userRes = await fetch('/api/users/current', {
       credentials: 'include',
     });
     if (!userRes.ok) throw new Error('User fetch failed');
@@ -41,7 +41,7 @@ export function AuthProvider(props: { children: JSX.Element }) {
   }
 
   async function login(username: string, password: string) {
-    const res = await fetch('http://localhost:3000/api/login', {
+    const res = await fetch('/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
@@ -54,7 +54,7 @@ export function AuthProvider(props: { children: JSX.Element }) {
   }
 
   async function register(username: string, password: string) {
-    const res = await fetch('http://localhost:3000/api/register', {
+    const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),

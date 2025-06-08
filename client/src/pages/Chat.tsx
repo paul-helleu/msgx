@@ -14,7 +14,10 @@ import { useApp } from '../components/AppContext';
 export default function Chat() {
   const params = useParams();
   const channelId = () => params.channelId;
-  const socket = io('http://localhost:3300');
+  const socket = io('https://localhost:3300', {
+    withCredentials: true,
+    transports: ['websocket'],
+  });
   const { user } = useAuth();
 
   const { storeChat, setStoreChat, setUserStatus } = useApp();
@@ -47,18 +50,15 @@ export default function Chat() {
       return;
     }
 
-    fetch(
-      `http://localhost:3000/api/messages/${storeChat.currentConversation?.channel_id}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ content: message.content }),
-        credentials: 'include',
-      }
-    ).catch((err: Error) => {
+    fetch(`/api/messages/${storeChat.currentConversation?.channel_id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ content: message.content }),
+      credentials: 'include',
+    }).catch((err: Error) => {
       toast.error('Une erreur est survenu: ' + err.message);
     });
   };

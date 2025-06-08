@@ -34,7 +34,7 @@ export default function ProfileFooter({
         <div class="flex gap-6 text-2xl">
           <FiLogOut
             onClick={() => {
-              fetch('http://localhost:3000/api/logout', {
+              fetch('/api/logout', {
                 method: 'POST',
                 credentials: 'include',
               });

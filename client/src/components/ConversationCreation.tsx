@@ -48,7 +48,7 @@ export default function ConversationCreation(props: {
   });
 
   const fetchUsers = async (term: string) =>
-    fetch('http://localhost:3000/api/users', {
+    fetch('/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,18 +82,15 @@ export default function ConversationCreation(props: {
       color: groupColor()?.value ?? 'bg-blue-500',
     };
 
-    const response = await fetch(
-      'http://localhost:3000/api/conversations/create',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      }
-    );
+    const response = await fetch('/api/conversations/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include',
+    });
 
     const data = await response.json();
 

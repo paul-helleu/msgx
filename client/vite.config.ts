@@ -1,16 +1,21 @@
 import { defineConfig } from 'vite';
 import solid from 'vite-plugin-solid';
+import fs from 'fs';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [solid(), tailwindcss()],
   server: {
-    host: '0.0.0.0',
     port: 5138,
+    https: {
+      key: fs.readFileSync('./certs/localhost-key.pem'),
+      cert: fs.readFileSync('./certs/localhost.pem'),
+    },
     proxy: {
       '/api': {
-        target: 'http://192.168.1.12:3000',
+        target: 'https://localhost:3000',
         changeOrigin: true,
+        secure: false,
       },
     },
   },

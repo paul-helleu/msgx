@@ -1,22 +1,31 @@
-import { createServer } from 'http';
+import fs from 'fs';
+import https from 'https';
 import { Server } from 'socket.io';
+
 declare module 'socket.io' {
   interface Socket {
     username?: string;
   }
 }
-const port = Number(process.env.SERVER_SOCKET_PORT) || 3300;
-const client = process.env.SERVER_CLIENT_URI;
 
-const httpServer = createServer();
+const PORT = Number(process.env.SERVER_SOCKET_PORT);
+const SERVER_CLIENT_URI = process.env.SERVER_CLIENT_URI;
 
-const io = new Server(httpServer, {
+const httpsOptions = {
+  key: fs.readFileSync('./certs/localhost-key.pem'),
+  cert: fs.readFileSync('./certs/localhost.pem'),
+};
+
+const httpsServer = https.createServer(httpsOptions);
+
+const io = new Server(httpsServer, {
   cors: {
-    origin: client,
+    origin: SERVER_CLIENT_URI,
+    credentials: true,
   },
 });
 
-httpServer.listen(port);
+httpsServer.listen(PORT);
 
 io.on('connection', (socket) => {
   socket.on('joinChannel', (channelId) => {
