@@ -12,8 +12,8 @@ const PORT = Number(process.env.SERVER_SOCKET_PORT);
 const SERVER_CLIENT_URI = process.env.SERVER_CLIENT_URI;
 
 const httpsOptions = {
-  key: fs.readFileSync('./certs/localhost-key.pem'),
-  cert: fs.readFileSync('./certs/localhost.pem'),
+  key: fs.readFileSync('./certs/cert.key'),
+  cert: fs.readFileSync('./certs/cert.crt'),
 };
 
 const httpsServer = https.createServer(httpsOptions);
