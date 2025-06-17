@@ -14,7 +14,8 @@ import { useApp } from '../components/AppContext';
 export default function Chat() {
   const params = useParams();
   const channelId = () => params.channelId;
-  const socket = io('https://localhost:3300', {
+
+  const socket = io(`https://${import.meta.env.VITE_SOCKET_IP}:3300`, {
     withCredentials: true,
     transports: ['websocket'],
   });
